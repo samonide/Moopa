@@ -96,8 +96,6 @@ export const authOptions: NextAuthOptions = {
           };
         },
       },
-      clientId: getEnv("CLIENT_ID"),
-      clientSecret: getEnv("CLIENT_SECRET"),
       profile(profile) {
         return {
           token: profile.token,
