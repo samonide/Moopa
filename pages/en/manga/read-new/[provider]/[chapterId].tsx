@@ -167,8 +167,22 @@ export default function MangaReader({
                                     {currentChapter.title && ` - ${currentChapter.title}`}
                                 </span>
                                 <button
-                                    onClick={() => setShowSettings(!showSettings)}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setShowChapterList(!showChapterList);
+                                    }}
                                     className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+                                    title="Chapter List"
+                                >
+                                    <BookOpenIcon className="w-6 h-6 text-white" />
+                                </button>
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setShowSettings(!showSettings);
+                                    }}
+                                    className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+                                    title="Settings"
                                 >
                                     <Cog6ToothIcon className="w-6 h-6 text-white" />
                                 </button>
@@ -179,7 +193,10 @@ export default function MangaReader({
 
                 {/* Settings Panel */}
                 {showSettings && (
-                    <div className="fixed top-16 right-4 z-50 bg-secondary rounded-lg p-4 shadow-xl w-72">
+                    <div 
+                        className="fixed top-16 right-4 z-50 bg-secondary rounded-lg p-4 shadow-xl w-72"
+                        onClick={(e) => e.stopPropagation()}
+                    >
                         <div className="flex items-center justify-between mb-4">
                             <h3 className="font-semibold">Reader Settings</h3>
                             <button onClick={() => setShowSettings(false)}>

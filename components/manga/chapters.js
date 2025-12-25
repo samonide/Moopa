@@ -12,6 +12,7 @@ const ChapterSelector = ({ chaptersData, data, setWatch, mangaId }) => {
   );
   // const [selectedChapter, setSelectedChapter] = useState("");
   const [chapters, setChapters] = useState([]);
+  const [sortOrder, setSortOrder] = useState("desc"); // "desc" = latest first, "asc" = oldest first
   const [currentPage, setCurrentPage] = useState(1);
   const [chaptersPerPage] = useState(10);
 
@@ -19,10 +20,21 @@ const ChapterSelector = ({ chaptersData, data, setWatch, mangaId }) => {
     const selectedChapters = chaptersData.find(
       (c) => c.providerId === selectedProvider
     );
-    setChapters(selectedChapters?.chapters || []);
+    const chaptersList = selectedChapters?.chapters || [];
+    
+    // Sort chapters based on sortOrder
+    const sortedChapters = [...chaptersList].sort((a, b) => {
+      if (sortOrder === "asc") {
+        return a.number - b.number; // Oldest first
+      } else {
+        return b.number - a.number; // Latest first
+      }
+    });
+    
+    setChapters(sortedChapters);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedProvider, chaptersData]);
+  }, [selectedProvider, chaptersData, sortOrder]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -93,29 +105,46 @@ const ChapterSelector = ({ chaptersData, data, setWatch, mangaId }) => {
 
   return (
     <div className="flex flex-col gap-2 px-3">
-      <div className="flex justify-between">
+      <div className="flex justify-between items-center">
         <h1 className="text-[20px] lg:text-2xl font-bold font-karla">
           Chapters
         </h1>
-        <div className="relative flex gap-2 items-center group">
-          {chaptersData.length > 1 && (
-            <>
-              <select
-                id="provider"
-                className="flex items-center text-sm gap-5 rounded-[3px] bg-secondary py-1 px-3 pr-8 font-karla appearance-none cursor-pointer outline-none focus: focus:ring-action group-hover: group-hover:ring-action"
-                value={selectedProvider}
-                onChange={(e) => setSelectedProvider(e.target.value)}
-              >
-                {/* <option value="">--Select a provider--</option> */}
-                {chaptersData.map((provider, index) => (
-                  <option key={provider.providerId} value={provider.providerId}>
-                    {provider.providerId}
-                  </option>
-                ))}
-              </select>
-              <ChevronDownIcon className="absolute right-2 top-1/2 transform -translate-y-1/2 w-5 h-5 pointer-events-none" />
-            </>
-          )}
+        <div className="flex gap-2 items-center">
+          {/* Sort Order Toggle */}
+          <button
+            onClick={() => setSortOrder(prev => prev === "desc" ? "asc" : "desc")}
+            className="flex items-center gap-2 text-sm rounded-[3px] bg-secondary py-1 px-3 font-karla hover:ring-1 hover:ring-action transition-all"
+            title={sortOrder === "desc" ? "Showing: Latest First" : "Showing: Oldest First"}
+          >
+            <span>{sortOrder === "desc" ? "Latest First" : "Oldest First"}</span>
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              {sortOrder === "desc" ? (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              ) : (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+              )}
+            </svg>
+          </button>
+          <div className="relative flex gap-2 items-center group">
+            {chaptersData.length > 1 && (
+              <>
+                <select
+                  id="provider"
+                  className="flex items-center text-sm gap-5 rounded-[3px] bg-secondary py-1 px-3 pr-8 font-karla appearance-none cursor-pointer outline-none focus: focus:ring-action group-hover: group-hover:ring-action"
+                  value={selectedProvider}
+                  onChange={(e) => setSelectedProvider(e.target.value)}
+                >
+                  {/* <option value="">--Select a provider--</option> */}
+                  {chaptersData.map((provider, index) => (
+                    <option key={provider.providerId} value={provider.providerId}>
+                      {provider.providerId}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDownIcon className="absolute right-2 top-1/2 transform -translate-y-1/2 w-5 h-5 pointer-events-none" />
+              </>
+            )}
+          </div>
         </div>
       </div>
 
