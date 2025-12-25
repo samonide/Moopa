@@ -1,6 +1,8 @@
 # Moopa - Modern Anime Streaming Platform
 
 <div align="center">
+  <img src="public/favicon.svg" alt="Moopa Logo" width="80" height="80" style="border-radius: 12px; margin-bottom: 20px;">
+  
   <h2>A Next.js Anime Streaming Experience</h2>
   
   [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)

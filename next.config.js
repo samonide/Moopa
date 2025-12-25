@@ -62,6 +62,16 @@ module.exports = withPWA({
       },
     ];
   },
+  async headers() {
+    return [
+      {
+        source: "/:path(favicon.*|icon.*|manifest.json)",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=0, must-revalidate" },
+        ],
+      },
+    ];
+  },
   // async headers() {
   //   return [
   //     {
@@ -84,9 +94,9 @@ module.exports = withPWA({
   //         },
   //       ],
   //     },
-  // {
-  //   source: "/:path*",
-  //   headers: nextSafe({
+  //     {
+  //       source: "/:path*",
+  //       headers: nextSafe({
   //     contentTypeOptions: "nosniff",
   //     contentSecurityPolicy: {
   //       "base-uri": "'none'",

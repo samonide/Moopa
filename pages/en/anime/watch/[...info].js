@@ -605,10 +605,10 @@ export default function Watch({
                         router.push(`/en/anime/watch/${info.id}/${source.value}?id=${watchId}&num=${epiNumber}${dub ? `&dub=${dub}` : ""}`);
                       }
                     }}
-                    className={`px-4 py-2 rounded-lg font-karla font-semibold text-sm transition-all duration-200 ${providerParam === source.value
-                      ? "bg-action text-white shadow-lg"
+                    className={`px-4 py-2 rounded-lg font-karla font-semibold text-sm transition-all duration-150 active:scale-95 ${providerParam === source.value
+                      ? "bg-action text-white shadow-lg ring-2 ring-action/50"
                       : source.available
-                        ? "bg-secondary hover:bg-secondary/80 text-white"
+                        ? "bg-secondary hover:bg-secondary/80 hover:scale-105 text-white hover:shadow-md"
                         : "bg-secondary/50 text-white/30 cursor-not-allowed"
                       }`}
                   >
