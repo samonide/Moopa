@@ -8,10 +8,12 @@ export const authOptions: NextAuthOptions = {
       id: "AniListProvider",
       name: "AniList",
       type: "oauth",
+      clientId: getEnv("CLIENT_ID"),
+      clientSecret: getEnv("CLIENT_SECRET"),
       token: "https://anilist.co/api/v2/oauth/token",
       authorization: {
         url: "https://anilist.co/api/v2/oauth/authorize",
-        params: { scope: "", response_type: "code" },
+        params: { scope: "QUERY", response_type: "code" },
       },
       userinfo: {
         url: process.env.GRAPHQL_ENDPOINT,

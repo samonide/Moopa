@@ -2,6 +2,7 @@ import Skeleton from "react-loading-skeleton";
 import Link from "next/link";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import { useRouter } from "next/router";
+import { useState } from "react";
 import { AniListInfoTypes } from "types/info/AnilistInfoTypes";
 import { Episode } from "types/api/Episode";
 
@@ -26,8 +27,24 @@ export default function EpisodeLists({
   dub,
 }: EpisodeListsProps) {
   const progress = info.mediaListEntry?.progress;
-
   const router = useRouter();
+  const [episodeBatch, setEpisodeBatch] = useState(0);
+
+  // Calculate episode batches (100 episodes per batch)
+  const episodesPerBatch = 100;
+  const totalBatches = episode ? Math.ceil(episode.length / episodesPerBatch) : 0;
+  const batchOptions = Array.from({ length: totalBatches }, (_, i) => {
+    const start = i * episodesPerBatch + 1;
+    const end = Math.min((i + 1) * episodesPerBatch, episode?.length || 0);
+    return { batch: i, label: `${start}-${end}`, start, end };
+  });
+
+  const currentBatchEpisodes = episode
+    ? episode.slice(
+      episodeBatch * episodesPerBatch,
+      (episodeBatch + 1) * episodesPerBatch
+    )
+    : [];
 
   return (
     <div className="w-screen lg:max-w-sm xl:max-w-lg">
@@ -60,34 +77,52 @@ export default function EpisodeLists({
           </svg>
         </button>
         {episode && (
-          <div className="relative flex gap-2 items-center group">
-            <select
-              value={track?.playing?.number}
-              onChange={(e) => {
-                const selectedEpisode = episode.find(
-                  (episode) => episode.number === parseInt(e.target.value)
-                );
+          <div className="flex gap-2 items-center">
+            {batchOptions.length > 1 && (
+              <div className="relative flex gap-2 items-center group">
+                <select
+                  value={episodeBatch}
+                  onChange={(e) => setEpisodeBatch(parseInt(e.target.value))}
+                  className="flex items-center text-sm gap-5 rounded-lg bg-secondary hover:bg-secondary/80 py-2 px-4 pr-10 font-karla appearance-none cursor-pointer outline-none focus:ring-2 focus:ring-action/50 transition-all duration-200 shadow-md hover:shadow-lg"
+                >
+                  {batchOptions.map((batch) => (
+                    <option key={batch.batch} value={batch.batch}>
+                      Episodes {batch.label}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDownIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 pointer-events-none transition-transform group-hover:translate-y-[-45%]" />
+              </div>
+            )}
+            <div className="relative flex gap-2 items-center group">
+              <select
+                value={track?.playing?.number}
+                onChange={(e) => {
+                  const selectedEpisode = episode.find(
+                    (episode) => episode.number === parseInt(e.target.value)
+                  );
 
-                router.push(
-                  `/en/anime/watch/${info.id}/${providerId}?id=${selectedEpisode?.id
-                  }&num=${selectedEpisode?.number}${dub ? `&dub=${dub}` : ""}`
-                );
-              }}
-              className="flex items-center text-sm gap-5 rounded-lg bg-secondary hover:bg-secondary/80 py-2 px-4 pr-10 font-karla appearance-none cursor-pointer outline-none focus:ring-2 focus:ring-action/50 transition-all duration-200 shadow-md hover:shadow-lg"
-            >
-              {episode?.map((x) => (
-                <option key={x.id} value={x.number}>
-                  Episode {x.number}
-                </option>
-              ))}
-            </select>
-            <ChevronDownIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 pointer-events-none transition-transform group-hover:translate-y-[-45%]" />
+                  router.push(
+                    `/en/anime/watch/${info.id}/${providerId}?id=${selectedEpisode?.id
+                    }&num=${selectedEpisode?.number}${dub ? `&dub=${dub}` : ""}`
+                  );
+                }}
+                className="flex items-center text-sm gap-5 rounded-lg bg-secondary hover:bg-secondary/80 py-2 px-4 pr-10 font-karla appearance-none cursor-pointer outline-none focus:ring-2 focus:ring-action/50 transition-all duration-200 shadow-md hover:shadow-lg"
+              >
+                {currentBatchEpisodes?.map((x) => (
+                  <option key={x.id} value={x.number}>
+                    Episode {x.number}
+                  </option>
+                ))}
+              </select>
+              <ChevronDownIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 pointer-events-none transition-transform group-hover:translate-y-[-45%]" />
+            </div>
           </div>
         )}
       </div>
       <div className="grid grid-cols-5 gap-2 lg:pl-5 py-2 scrollbar-thin px-2 scrollbar-thumb-[#313131] scrollbar-thumb-rounded-full">
-        {episode && episode.length > 0 ? (
-          episode.map((item) => {
+        {currentBatchEpisodes && currentBatchEpisodes.length > 0 ? (
+          currentBatchEpisodes.map((item) => {
             const time = artStorage?.[item.id]?.timeWatched;
             const duration = artStorage?.[item.id]?.duration;
             let prog = (time / duration) * 100;

@@ -595,8 +595,7 @@ export default function Watch({
               <div className="flex gap-2">
                 {[
                   { name: "Source 1", value: "source1", available: true },
-                  { name: "Source 2", value: "source2", available: false },
-                  { name: "Source 3", value: "source3", available: false }
+                  { name: "Source 2", value: "source2", available: true }
                 ].map((source, index) => (
                   <button
                     key={source.value}

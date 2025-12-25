@@ -180,18 +180,18 @@ export default function ChangeLogs() {
                     </p> */}
                   </div>
 
-                  {logs.map((x) => (
+                  {logs.length > 0 && (
                     <ChangelogsVersions
-                      notes={x.notes}
-                      version={x.version}
-                      pre={x.pre}
-                      key={x.version}
+                      notes={logs[0].notes}
+                      version={logs[0].version}
+                      pre={logs[0].pre}
+                      key={logs[0].version}
                     >
-                      {x.changes.map((i, index) => (
+                      {logs[0].changes.map((i, index) => (
                         <p key={index}>- {i}</p>
                       ))}
                     </ChangelogsVersions>
-                  ))}
+                  )}
 
                   <div className="mt-2 text-gray-400 text-sm">
                     <p>
