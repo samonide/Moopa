@@ -12,6 +12,8 @@ export interface AniListInfoTypes {
   nextAiringEpisode: any;
   averageScore: number;
   popularity: number;
+  trending?: number;
+  favourites?: number;
   status: string;
   genres: string[];
   season: any;

@@ -49,10 +49,6 @@ export default function App({
     getBroadcast();
   }, []);
 
-  const handleCheatCodeEntered = () => {
-    alert("Cheat code entered!"); // You can replace this with your desired action
-  };
-
   return (
     <>
       <ErrorBoundary>

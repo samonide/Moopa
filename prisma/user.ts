@@ -120,8 +120,7 @@ export const deleteUser = async (name: string): Promise<UserProfile | null> => {
 
 export const createList = async (
   name: string,
-  id: string,
-  title: string
+  id: string
 ): Promise<UserProfile | null> => {
   try {
     const checkEpisode = await prisma.watchListEpisode.findFirst({

@@ -194,7 +194,7 @@ export function PreviousEpisode({
   );
 }
 
-export function MobilePlayButton({ tooltipPlacement, host }: MediaButtonProps) {
+export function MobilePlayButton({ host }: MediaButtonProps) {
   const isPaused = useMediaState("paused"),
     ended = useMediaState("ended"),
     Icon = ended ? ReplayIcon : isPaused ? PlayIcon : PauseIcon;
@@ -274,8 +274,7 @@ export function TheaterButton({ tooltipPlacement, offset }: MediaButtonProps) {
           className={buttonClass}
           onClick={() => {
             setPlayerState({
-              ...playerState,
-              currentTime: playerState.currentTime,
+              currentTime: playerState,
               isPlaying: isPlaying
             });
             setTheaterMode(!theaterMode);
@@ -324,7 +323,6 @@ export function PIP({ tooltipPlacement, offset }: MediaButtonProps) {
 }
 
 export function PlayNextButton({
-  tooltipPlacement,
   navigation
 }: MediaButtonProps) {
   // const remote = useMediaRemote();
@@ -350,7 +348,7 @@ export function PlayNextButton({
   );
 }
 
-export function SkipOpButton({ tooltipPlacement, offset }: MediaButtonProps) {
+export function SkipOpButton({ }: MediaButtonProps) {
   const remote = useMediaRemote();
   const { track } = useWatchProvider();
   const op = track?.skip?.find((item: any) => item.text === "Opening");
@@ -368,7 +366,7 @@ export function SkipOpButton({ tooltipPlacement, offset }: MediaButtonProps) {
   );
 }
 
-export function SkipEdButton({ tooltipPlacement, offset }: MediaButtonProps) {
+export function SkipEdButton({ }: MediaButtonProps) {
   const remote = useMediaRemote();
   const { duration } = useMediaStore();
   const { track } = useWatchProvider();

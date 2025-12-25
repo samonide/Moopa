@@ -19,8 +19,8 @@ interface WatchPageContextType {
   setPlayerState: (value: PlayerState) => void;
   autoplay: boolean | null;
   setAutoPlay: (value: boolean | null) => void;
-  autoNext: boolean | null;
-  setAutoNext: (value: boolean | null) => void;
+  autoNext: boolean | null | string;
+  setAutoNext: (value: boolean | null | string) => void;
   marked: number;
   setMarked: (value: number) => void;
   userData: any;
@@ -43,7 +43,7 @@ export const WatchPageProvider = ({ children }: { children: ReactNode }) => {
     isPlaying: false,
   });
   const [autoplay, setAutoPlay] = useState<boolean | null>(null);
-  const [autoNext, setAutoNext] = useState<boolean | null>(null);
+  const [autoNext, setAutoNext] = useState<boolean | null | string>(null);
   const [marked, setMarked] = useState(0);
 
   const [userData, setUserData] = useState<any>(null);

@@ -268,9 +268,8 @@ export default function Content({
   return (
     <div>
       <div
-        className={`flex items-center justify-between lg:justify-normal lg:gap-3 px-5 z-40 ${
-          section === "Recommendations" ? "" : "cursor-pointer"
-        }`}
+        className={`flex items-center justify-between lg:justify-normal lg:gap-3 px-5 z-40 ${section === "Recommendations" ? "" : "cursor-pointer"
+          }`}
         onClick={goToPage}
       >
         <h1 className="font-karla text-[20px] font-bold">{section}</h1>
@@ -279,9 +278,8 @@ export default function Content({
       <div className="relative flex items-center lg:gap-2">
         <div
           onClick={slideLeft}
-          className={`flex items-center mb-5 cursor-pointer hover:text-action absolute left-0 bg-gradient-to-r from-[#141519] z-40 h-full hover:opacity-100 ${
-            scrollLeft ? "lg:visible" : "invisible"
-          }`}
+          className={`flex items-center mb-5 cursor-pointer hover:text-action absolute left-0 bg-gradient-to-r from-[#141519] z-40 h-full hover:opacity-100 ${scrollLeft ? "lg:visible" : "invisible"
+            }`}
         >
           <ChevronLeftIcon className="w-7 h-7 stroke-2" />
         </div>
@@ -294,245 +292,239 @@ export default function Content({
         >
           {ids !== "recentlyWatched"
             ? slicedData?.map((anime) => {
-                const progress = og?.find((i: any) => i.mediaId === anime.id);
+              const progress = og?.find((i: any) => i.mediaId === anime.id);
 
-                let image;
-                if (typeof anime.coverImage === "string") {
-                  image = truncateImgUrl(anime.coverImage);
-                } else if (anime.coverImage) {
-                  image = anime.coverImage.extraLarge || anime.coverImage.large;
-                }
+              let image;
+              if (typeof anime.coverImage === "string") {
+                image = truncateImgUrl(anime.coverImage);
+              } else if (anime.coverImage) {
+                image = anime.coverImage.extraLarge || anime.coverImage.large;
+              }
 
-                if (!image && anime.image) {
-                  image = anime.image;
-                }
+              if (!image && anime.image) {
+                image = anime.image;
+              }
 
-                return (
-                  <div
-                    key={anime.id}
-                    className="flex flex-col gap-3 shrink-0 cursor-pointer"
+              return (
+                <div
+                  key={anime.id}
+                  className="flex flex-col gap-3 shrink-0 cursor-pointer"
+                >
+                  <Link
+                    href={
+                      ids === "listManga"
+                        ? `/en/manga/${anime.id}`
+                        : ids === "recentAdded"
+                          ? anime?.slug
+                            ? `/en/anime/watch/${anime.id
+                            }/gogoanime?id=${encodeURIComponent(
+                              anime?.slug?.replace('/', '')
+                            )}&num=${anime.currentEpisode}`
+                            : `/en/${type}/${anime.id}`
+                          : `/en/${type}/${anime.id}`
+                    }
+                    className="hover:scale-105 hover:shadow-lg duration-300 ease-out group relative"
+                    title={anime.title.romaji}
                   >
+                    {ids === "onGoing" && (
+                      <div className="h-[190px] lg:h-[265px] w-[135px] lg:w-[185px] bg-gradient-to-b from-transparent to-black/90 absolute z-40 rounded-md whitespace-normal font-karla group">
+                        <div className="flex flex-col items-center h-full justify-end text-center pb-5">
+                          <h1 className="line-clamp-1 w-[70%] text-[10px]">
+                            {anime.title.romaji || anime.title.english}
+                          </h1>
+                          {checkProgress(progress) &&
+                            !clicked?.hasOwnProperty(anime.id) && (
+                              <ExclamationCircleIcon className="w-7 h-7 absolute z-40 text-white -top-3 -right-3" />
+                            )}
+                          {checkProgress(progress) && (
+                            <div
+                              onClick={() => handleAlert(String(anime.id))}
+                              className="group-hover:visible invisible absolute top-0 bg-black bg-opacity-20 w-full h-full z-20 text-center"
+                            >
+                              <h1 className="text-[12px] lg:text-sm pt-28 lg:pt-44 font-bold opacity-100">
+                                {checkProgress(progress)}
+                              </h1>
+                            </div>
+                          )}
+                          {anime.nextAiringEpisode && (
+                            <div className="flex gap-1 text-[13px] lg:text-base">
+                              <h1>
+                                Episode {anime.nextAiringEpisode.episode} in
+                              </h1>
+                              <h1 className="font-bold">
+                                {convertSecondsToTime(
+                                  anime?.nextAiringEpisode?.timeUntilAiring
+                                )}
+                              </h1>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                    <div className="h-[190px] w-[135px] lg:h-[265px] lg:w-[185px] rounded-md z-30">
+                      {ids === "recentAdded" && (
+                        <div className="absolute bg-gradient-to-b from-black/30 to-transparent from-5% to-30% top-0 z-30 w-full h-full rounded" />
+                      )}
+                      {image && (
+                        <Image
+                          draggable={false}
+                          src={image}
+                          alt={
+                            anime.title.romaji ||
+                            anime.title.english ||
+                            "coverImage"
+                          }
+                          width={500}
+                          height={300}
+                          className="z-20 h-[190px] w-[135px] lg:h-[265px] lg:w-[185px] object-cover rounded-md brightness-90"
+                        />
+                      )}
+                    </div>
+                    {ids === "recentAdded" && (
+                      <Fragment>
+                        <Image
+                          src="/svg/episode-badge.svg"
+                          alt="episode-badge"
+                          width={200}
+                          height={100}
+                          className="w-24 lg:w-32 absolute top-1 -right-[12px] lg:-right-[17px] z-40"
+                        />
+                        <p className="absolute z-40 text-center w-[86px] lg:w-[110px] top-1 -right-2 lg:top-[5.5px] lg:-right-2 font-karla text-sm lg:text-base">
+                          Episode{" "}
+                          <span className="text-white">
+                            {anime?.currentEpisode || anime?.episodeNumber}
+                          </span>
+                        </p>
+                      </Fragment>
+                    )}
+                  </Link>
+                  {ids !== "onGoing" && (
                     <Link
                       href={
                         ids === "listManga"
                           ? `/en/manga/${anime.id}`
-                          : ids === "recentAdded"
-                          ? anime?.slug
-                            ? `/en/anime/watch/${
-                                anime.id
-                              }/gogoanime?id=${encodeURIComponent(
-                                anime?.slug?.replace('/', '')
-                              )}&num=${anime.currentEpisode}`
-                            : `/en/${type}/${anime.id}`
-                          : `/en/${type}/${anime.id}`
+                          : `/en/${type.toLowerCase()}/${anime.id}`
                       }
-                      className="hover:scale-105 hover:shadow-lg duration-300 ease-out group relative"
+                      className="w-[135px] lg:w-[185px] line-clamp-2"
                       title={anime.title.romaji}
                     >
-                      {ids === "onGoing" && (
-                        <div className="h-[190px] lg:h-[265px] w-[135px] lg:w-[185px] bg-gradient-to-b from-transparent to-black/90 absolute z-40 rounded-md whitespace-normal font-karla group">
-                          <div className="flex flex-col items-center h-full justify-end text-center pb-5">
-                            <h1 className="line-clamp-1 w-[70%] text-[10px]">
-                              {anime.title.romaji || anime.title.english}
-                            </h1>
-                            {checkProgress(progress) &&
-                              !clicked?.hasOwnProperty(anime.id) && (
-                                <ExclamationCircleIcon className="w-7 h-7 absolute z-40 text-white -top-3 -right-3" />
-                              )}
-                            {checkProgress(progress) && (
-                              <div
-                                onClick={() => handleAlert(String(anime.id))}
-                                className="group-hover:visible invisible absolute top-0 bg-black bg-opacity-20 w-full h-full z-20 text-center"
-                              >
-                                <h1 className="text-[12px] lg:text-sm pt-28 lg:pt-44 font-bold opacity-100">
-                                  {checkProgress(progress)}
-                                </h1>
-                              </div>
-                            )}
-                            {anime.nextAiringEpisode && (
-                              <div className="flex gap-1 text-[13px] lg:text-base">
-                                <h1>
-                                  Episode {anime.nextAiringEpisode.episode} in
-                                </h1>
-                                <h1 className="font-bold">
-                                  {convertSecondsToTime(
-                                    anime?.nextAiringEpisode?.timeUntilAiring
-                                  )}
-                                </h1>
-                              </div>
-                            )}
-                          </div>
-                        </div>
+                      <h1 className="font-karla font-semibold xl:text-base text-[15px]">
+                        {anime.status === "RELEASING" ||
+                          ids === "recentAdded" ? (
+                          <span className="dots bg-green-500" />
+                        ) : anime.status === "NOT_YET_RELEASED" ? (
+                          <span className="dots bg-red-500" />
+                        ) : null}
+                        {anime.title.romaji}
+                      </h1>
+                    </Link>
+                  )}
+                </div>
+              );
+            })
+            : userData
+              ?.filter((i) => i.title && i.title !== null)
+              ?.slice(0, 10)
+              .map((i) => {
+                const time = i.timeWatched;
+                const duration = i.duration;
+                let prog = time && duration ? (time / duration) * 100 : 0;
+                if (prog > 90) prog = 100;
+
+                return (
+                  <div
+                    key={i.watchId}
+                    className="flex flex-col gap-2 shrink-0 cursor-pointer relative group/item"
+                  >
+                    <div className="absolute flex flex-col gap-1 z-40 top-1 right-1 transition-all duration-200 ease-out opacity-0 group-hover/item:opacity-100 scale-90 group-hover/item:scale-100 group-hover/item:visible invisible ">
+                      <HistoryOptions
+                        remove={removeItem}
+                        watchId={i.watchId}
+                        aniId={i.aniId}
+                      />
+                      {i?.nextId && (
+                        <button
+                          type="button"
+                          className="flex flex-col items-center group/next relative"
+                          onClick={() => {
+                            router.push(
+                              `/en/anime/watch/${i.aniId}/${i.provider
+                              }?id=${encodeURIComponent(
+                                i?.nextId || ""
+                              )}&num=${i?.nextNumber}${i?.dub ? `&dub=${i?.dub}` : ""
+                              }`
+                            );
+                          }}
+                        >
+                          <ChevronRightIcon className="w-6 h-6 shrink-0 bg-primary p-1 rounded-full hover:text-action scale-100 hover:scale-105 transition-all duration-200 ease-out" />
+                          <span className="absolute font-karla bg-secondary shadow-black shadow-2xl py-1 px-2 whitespace-nowrap text-white text-sm rounded-md right-7 -bottom-[2px] z-40 duration-300 transition-all ease-out group-hover/next:visible group-hover/next:scale-100 group-hover/next:translate-x-0 group-hover/next:opacity-100 opacity-0 translate-x-10 scale-50 invisible">
+                            Play Next Episode
+                          </span>
+                        </button>
                       )}
-                      <div className="h-[190px] w-[135px] lg:h-[265px] lg:w-[185px] rounded-md z-30">
-                        {ids === "recentAdded" && (
-                          <div className="absolute bg-gradient-to-b from-black/30 to-transparent from-5% to-30% top-0 z-30 w-full h-full rounded" />
-                        )}
-                        {image && (
-                          <Image
-                            draggable={false}
-                            src={image}
-                            alt={
-                              anime.title.romaji ||
-                              anime.title.english ||
-                              "coverImage"
-                            }
-                            width={500}
-                            height={300}
-                            className="z-20 h-[190px] w-[135px] lg:h-[265px] lg:w-[185px] object-cover rounded-md brightness-90"
-                          />
-                        )}
+                    </div>
+                    <Link
+                      className="relative w-[320px] aspect-video rounded-md overflow-hidden group"
+                      href={`/en/anime/watch/${i.aniId}/${i.provider
+                        }?id=${encodeURIComponent(i.watchId)}&num=${i.episode}${i?.dub ? `&dub=${i?.dub}` : ""
+                        }`}
+                    >
+                      <div className="w-full h-full bg-gradient-to-t from-black/70 from-20% to-transparent group-hover:to-black/40 transition-all duration-300 ease-out absolute z-30" />
+                      <div className="absolute bottom-3 left-0 mx-2 text-white flex gap-2 items-center w-[80%] z-30">
+                        <PlayIcon className="w-5 h-5 shrink-0" />
+                        <h1
+                          className="font-semibold font-karla line-clamp-1"
+                          title={i?.title || i?.aniTitle}
+                        >
+                          {i?.title === i.aniTitle
+                            ? `Episode ${i.episode}`
+                            : i?.title || i?.aniTitle}
+                        </h1>
                       </div>
-                      {ids === "recentAdded" && (
-                        <Fragment>
-                          <Image
-                            src="/svg/episode-badge.svg"
-                            alt="episode-badge"
-                            width={200}
-                            height={100}
-                            className="w-24 lg:w-32 absolute top-1 -right-[12px] lg:-right-[17px] z-40"
-                          />
-                          <p className="absolute z-40 text-center w-[86px] lg:w-[110px] top-1 -right-2 lg:top-[5.5px] lg:-right-2 font-karla text-sm lg:text-base">
-                            Episode{" "}
-                            <span className="text-white">
-                              {anime?.currentEpisode || anime?.episodeNumber}
-                            </span>
-                          </p>
-                        </Fragment>
+                      <span
+                        className={`absolute bottom-0 left-0 h-[2px] bg-red-600 z-30`}
+                        style={{
+                          width: `${prog}%`,
+                        }}
+                      />
+
+                      {i?.image && (
+                        <Image
+                          src={i?.image}
+                          width={320}
+                          height={180}
+                          alt="Episode Thumbnail"
+                          className="w-full object-cover group-hover:scale-[1.02] duration-300 ease-out z-10"
+                        />
                       )}
                     </Link>
-                    {ids !== "onGoing" && (
-                      <Link
-                        href={
-                          ids === "listManga"
-                            ? `/en/manga/${anime.id}`
-                            : `/en/${type.toLowerCase()}/${anime.id}`
-                        }
-                        className="w-[135px] lg:w-[185px] line-clamp-2"
-                        title={anime.title.romaji}
-                      >
-                        <h1 className="font-karla font-semibold xl:text-base text-[15px]">
-                          {anime.status === "RELEASING" ||
-                          ids === "recentAdded" ? (
-                            <span className="dots bg-green-500" />
-                          ) : anime.status === "NOT_YET_RELEASED" ? (
-                            <span className="dots bg-red-500" />
-                          ) : null}
-                          {anime.title.romaji}
-                        </h1>
-                      </Link>
-                    )}
+
+                    <Link
+                      className="flex flex-col font-karla w-full"
+                      href={`/en/anime/watch/${i.aniId}/${i.provider
+                        }?id=${encodeURIComponent(i.watchId)}&num=${i.episode}`}
+                    >
+                      {/* <h1 className="font-semibold">{i.title}</h1> */}
+                      <p className="flex items-center gap-1 text-sm text-gray-400 w-[320px]">
+                        <span
+                          className="text-white"
+                          style={{
+                            display: "inline-block",
+                            maxWidth: "220px",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            whiteSpace: "nowrap",
+                          }}
+                          title={i.aniTitle}
+                        >
+                          {i.aniTitle}
+                        </span>{" "}
+                        | Episode {i.episode}
+                      </p>
+                    </Link>
                   </div>
                 );
-              })
-            : userData
-                ?.filter((i) => i.title && i.title !== null)
-                ?.slice(0, 10)
-                .map((i) => {
-                  const time = i.timeWatched;
-                  const duration = i.duration;
-                  let prog = time && duration ? (time / duration) * 100 : 0;
-                  if (prog > 90) prog = 100;
-
-                  return (
-                    <div
-                      key={i.watchId}
-                      className="flex flex-col gap-2 shrink-0 cursor-pointer relative group/item"
-                    >
-                      <div className="absolute flex flex-col gap-1 z-40 top-1 right-1 transition-all duration-200 ease-out opacity-0 group-hover/item:opacity-100 scale-90 group-hover/item:scale-100 group-hover/item:visible invisible ">
-                        <HistoryOptions
-                          remove={removeItem}
-                          watchId={i.watchId}
-                          aniId={i.aniId}
-                        />
-                        {i?.nextId && (
-                          <button
-                            type="button"
-                            className="flex flex-col items-center group/next relative"
-                            onClick={() => {
-                              router.push(
-                                `/en/anime/watch/${i.aniId}/${
-                                  i.provider
-                                }?id=${encodeURIComponent(
-                                  i?.nextId || ""
-                                )}&num=${i?.nextNumber}${
-                                  i?.dub ? `&dub=${i?.dub}` : ""
-                                }`
-                              );
-                            }}
-                          >
-                            <ChevronRightIcon className="w-6 h-6 shrink-0 bg-primary p-1 rounded-full hover:text-action scale-100 hover:scale-105 transition-all duration-200 ease-out" />
-                            <span className="absolute font-karla bg-secondary shadow-black shadow-2xl py-1 px-2 whitespace-nowrap text-white text-sm rounded-md right-7 -bottom-[2px] z-40 duration-300 transition-all ease-out group-hover/next:visible group-hover/next:scale-100 group-hover/next:translate-x-0 group-hover/next:opacity-100 opacity-0 translate-x-10 scale-50 invisible">
-                              Play Next Episode
-                            </span>
-                          </button>
-                        )}
-                      </div>
-                      <Link
-                        className="relative w-[320px] aspect-video rounded-md overflow-hidden group"
-                        href={`/en/anime/watch/${i.aniId}/${
-                          i.provider
-                        }?id=${encodeURIComponent(i.watchId)}&num=${i.episode}${
-                          i?.dub ? `&dub=${i?.dub}` : ""
-                        }`}
-                      >
-                        <div className="w-full h-full bg-gradient-to-t from-black/70 from-20% to-transparent group-hover:to-black/40 transition-all duration-300 ease-out absolute z-30" />
-                        <div className="absolute bottom-3 left-0 mx-2 text-white flex gap-2 items-center w-[80%] z-30">
-                          <PlayIcon className="w-5 h-5 shrink-0" />
-                          <h1
-                            className="font-semibold font-karla line-clamp-1"
-                            title={i?.title || i?.aniTitle}
-                          >
-                            {i?.title === i.aniTitle
-                              ? `Episode ${i.episode}`
-                              : i?.title || i?.aniTitle}
-                          </h1>
-                        </div>
-                        <span
-                          className={`absolute bottom-0 left-0 h-[2px] bg-red-600 z-30`}
-                          style={{
-                            width: `${prog}%`,
-                          }}
-                        />
-
-                        {i?.image && (
-                          <Image
-                            src={i?.image}
-                            width={320}
-                            height={180}
-                            alt="Episode Thumbnail"
-                            className="w-full object-cover group-hover:scale-[1.02] duration-300 ease-out z-10"
-                          />
-                        )}
-                      </Link>
-
-                      <Link
-                        className="flex flex-col font-karla w-full"
-                        href={`/en/anime/watch/${i.aniId}/${
-                          i.provider
-                        }?id=${encodeURIComponent(i.watchId)}&num=${i.episode}`}
-                      >
-                        {/* <h1 className="font-semibold">{i.title}</h1> */}
-                        <p className="flex items-center gap-1 text-sm text-gray-400 w-[320px]">
-                          <span
-                            className="text-white"
-                            style={{
-                              display: "inline-block",
-                              maxWidth: "220px",
-                              overflow: "hidden",
-                              textOverflow: "ellipsis",
-                              whiteSpace: "nowrap",
-                            }}
-                            title={i.aniTitle}
-                          >
-                            {i.aniTitle}
-                          </span>{" "}
-                          | Episode {i.episode}
-                        </p>
-                      </Link>
-                    </div>
-                  );
-                })}
+              })}
           {userData &&
             userData?.filter((i) => i.aniId !== null)?.length >= 10 &&
             section !== "Recommendations" && (
@@ -567,9 +559,8 @@ export default function Content({
         <MdChevronRight
           onClick={slideRight}
           size={30}
-          className={`hidden md:block mb-5 cursor-pointer hover:text-action absolute right-0 bg-gradient-to-l from-[#141519] z-40 h-full hover:opacity-100 hover:bg-gradient-to-l ${
-            scrollRight ? "visible" : "hidden"
-          }`}
+          className={`hidden md:block mb-5 cursor-pointer hover:text-action absolute right-0 bg-gradient-to-l from-[#141519] z-40 h-full hover:opacity-100 hover:bg-gradient-to-l ${scrollRight ? "visible" : "hidden"
+            }`}
         />
       </div>
     </div>
@@ -596,7 +587,7 @@ function convertSecondsToTime(sec: number) {
 
 function checkProgress(entry: { progress: any; media: any }) {
   const { progress, media } = entry;
-  const { episodes, nextAiringEpisode } = media;
+  const { nextAiringEpisode } = media;
 
   if (nextAiringEpisode !== null) {
     const { episode } = nextAiringEpisode;

@@ -119,9 +119,8 @@ export default function DetailTop({
           <button
             type="button"
             onClick={() => router.push(watchUrl ?? "#")}
-            className={`${
-              !watchUrl ? "opacity-30 pointer-events-none" : ""
-            } w-[180px] flex-center text-lg font-karla font-semibold gap-2 border-black border-opacity-10 text-black rounded-full py-1 px-4 bg-white hover:opacity-80`}
+            className={`${!watchUrl ? "opacity-30 pointer-events-none" : ""
+              } w-[180px] flex-center text-lg font-karla font-semibold gap-2 border-black border-opacity-10 text-black rounded-full py-1 px-4 bg-white hover:opacity-80`}
           >
             {isAnime ? (
               <PlayIcon className="w-5 h-5" />
@@ -222,9 +221,8 @@ export default function DetailTop({
           <button
             type="button"
             onClick={() => router.push(watchUrl ?? "#")}
-            className={`${
-              !watchUrl ? "opacity-30 pointer-events-none" : ""
-            } flex items-center text-lg font-karla font-semibold gap-1 border-black border-opacity-10 text-black rounded-full py-2 px-4 bg-white`}
+            className={`${!watchUrl ? "opacity-30 pointer-events-none" : ""
+              } flex items-center text-lg font-karla font-semibold gap-1 border-black border-opacity-10 text-black rounded-full py-2 px-4 bg-white`}
           >
             {isAnime ? (
               <PlayIcon className="w-5 h-5" />
@@ -318,23 +316,22 @@ export default function DetailTop({
           >
             {info?.relations?.edges
               .slice(0, showAll ? info?.relations?.edges.length : 3)
-              .map((r, index) => {
+              .map((r) => {
                 const rel = r.node;
                 return (
                   <Link
                     key={rel.id}
                     href={
                       rel.type === "ANIME" ||
-                      rel.type === "OVA" ||
-                      rel.type === "MOVIE" ||
-                      rel.type === "SPECIAL" ||
-                      rel.type === "ONA"
+                        rel.type === "OVA" ||
+                        rel.type === "MOVIE" ||
+                        rel.type === "SPECIAL" ||
+                        rel.type === "ONA"
                         ? `/en/anime/${rel.id}`
                         : `/en/manga/${rel.id}`
                     }
-                    className={`md:hover:scale-[1.02] snap-start hover:shadow-lg scale-100 transition-transform duration-200 ease-out w-full ${
-                      rel.type === "MUSIC" ? "pointer-events-none" : ""
-                    }`}
+                    className={`md:hover:scale-[1.02] snap-start hover:shadow-lg scale-100 transition-transform duration-200 ease-out w-full ${rel.type === "MUSIC" ? "pointer-events-none" : ""
+                      }`}
                   >
                     <div
                       key={rel.id}

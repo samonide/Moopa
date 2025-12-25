@@ -54,13 +54,11 @@ export function VideoLayout({
   }, []);
 
   useEffect(() => {
-    setRatingModalState((prev: any) => {
-      return {
-        ...prev,
-        isFullscreen: isFullscreen
-      };
+    setRatingModalState({
+      ...ratingModalState,
+      isFullscreen: isFullscreen
     });
-  }, [isFullscreen]);
+  }, [isFullscreen, ratingModalState, setRatingModalState]);
 
   return (
     <>

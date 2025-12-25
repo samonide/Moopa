@@ -36,7 +36,6 @@ export default async function handler(
     } else {
       const page = req.query.page || 1;
 
-      var hasNextPage = true;
       let datas: AnifyRecentEpisode[] = [];
 
       const fetchData = async (page: any) => {

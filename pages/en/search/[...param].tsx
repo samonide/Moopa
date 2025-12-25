@@ -130,7 +130,7 @@ export default function Card({
   async function advance() {
     setLoading(true);
     const data = await aniAdvanceSearch({
-      search: debounceSearch,
+      search: debounceSearch || undefined,
       type: type?.value as "ANIME" | "MANGA" | undefined,
       genres: genre,
       page: page,
@@ -390,17 +390,16 @@ export default function Card({
           <div className="flex flex-col gap-14 items-center z-30 overflow-x-hidden">
             <div
               key="card-keys"
-              className={`${
-                imageSearch ? "hidden" : ""
-              } grid pt-3 px-5 xl:px-0 xxs:grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-6 justify-items-center grid-cols-2 w-screen xl:w-auto xl:gap-7 gap-5 gap-y-10`}
+              className={`${imageSearch ? "hidden" : ""
+                } grid pt-3 px-5 xl:px-0 xxs:grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-6 justify-items-center grid-cols-2 w-screen xl:w-auto xl:gap-7 gap-5 gap-y-10`}
             >
               {loading
                 ? ""
                 : !data && (
-                    <div className="w-full text-[#ff7f57] col-span-6 items-center flex justify-center text-center font-bold font-karla xl:text-2xl">
-                      Oops!<br></br> Nothing's Found...
-                    </div>
-                  )}
+                  <div className="w-full text-[#ff7f57] col-span-6 items-center flex justify-center text-center font-bold font-karla xl:text-2xl">
+                    Oops!<br></br> Nothing's Found...
+                  </div>
+                )}
 
               {data &&
                 data?.length > 0 &&
@@ -535,17 +534,15 @@ export default function Card({
                             width={200}
                             height={200}
                             alt="Episode Thumbnail"
-                            className={`w-full object-cover group-hover:scale-[1.02] duration-300 ease-out z-10 ${
-                              !a.hovered ? "visible" : "hidden"
-                            }`}
+                            className={`w-full object-cover group-hover:scale-[1.02] duration-300 ease-out z-10 ${!a.hovered ? "visible" : "hidden"
+                              }`}
                           />
                         )}
                         {a?.video && (
                           <video
                             src={a.video}
-                            className={`w-full object-cover group-hover:scale-[1.02] duration-300 ease-out z-10 ${
-                              a.hovered ? "visible" : "hidden"
-                            }`}
+                            className={`w-full object-cover group-hover:scale-[1.02] duration-300 ease-out z-10 ${a.hovered ? "visible" : "hidden"
+                              }`}
                             autoPlay
                             muted
                             loop

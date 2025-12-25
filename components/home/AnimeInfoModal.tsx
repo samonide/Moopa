@@ -1,12 +1,10 @@
 import { Fragment } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import { Dialog, Transition } from "@headlessui/react";
 import { XMarkIcon, PlayIcon, StarIcon } from "@heroicons/react/24/solid";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
-import { cn } from "@/lib/utils";
 
 interface AnimeInfoModalProps {
     isOpen: boolean;

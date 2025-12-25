@@ -1,7 +1,6 @@
 import { aniListData } from "@/lib/anilist/AniList";
 import { useState, useEffect, Fragment } from "react";
 import Head from "next/head";
-import Link from "next/link";
 import Footer from "@/components/shared/footer";
 import Image from "next/image";
 import Content from "@/components/home/content";
@@ -19,7 +18,6 @@ import { getGreetings } from "@/utils/getGreetings";
 import { redis } from "@/lib/redis";
 import { Navbar } from "@/components/shared/NavBar";
 import UserRecommendation from "@/components/home/recommendation";
-import { useRouter } from "next/router";
 import { HeroCarousel } from "@/components/home/HeroCarousel";
 
 export async function getServerSideProps() {
@@ -120,7 +118,6 @@ export default function Home({
   detail,
   populars,
   upComing,
-  firstTrend,
   trendingCarousel,
 }: HomeProps) {
   const { data: sessions }: any = useSession();
@@ -142,9 +139,7 @@ export default function Home({
   });
   const { anime: release } = GetMedia(sessions);
 
-  const router = useRouter();
-
-  const [schedules, setSchedules] = useState(null);
+  const [schedules, _setSchedules] = useState(null);
   const [anime, setAnime] = useState([]);
 
   const [recentAdded, setRecentAdded] = useState([]);
@@ -340,10 +335,6 @@ export default function Home({
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userSession?.name, currentAnime, plan]);
-
-  function removeHtmlTags(text: string): string {
-    return text?.replace(/<[^>]+>/g, "");
-  }
 
   return (
     <Fragment>
@@ -649,6 +640,7 @@ export interface Media {
   title: Title;
   episodes: number;
   coverImage: CoverImage;
+  format?: string;
 }
 
 export interface Title {

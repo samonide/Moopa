@@ -44,8 +44,6 @@
 
 ### ✅ Complete
 - Multi-provider episode fetching and caching
-- HiAnime integration with MegaCloud extraction
-- AniCrush integration with dual decryption fallback
 - Source mapping and provider abstraction
 - Video player with adaptive bitrate
 - M3U8 manifest caching system
@@ -125,25 +123,6 @@ moopa/
 
 ---
 
-## 🎬 Streaming Providers
-
-### Source 1: HiAnime
-- **URL**: https://hianime.to
-- **Servers**: HD-1, HD-2, HD-3
-- **Format**: Robust search with direct ID matching
-- **Decryption**: Built-in MegaCloud support
-
-### Source 2: AniCrush (NEW)
-- **URL**: https://anicrush.to
-- **Servers**: Southcloud-1, Southcloud-2, Southcloud-3
-- **Search**: Levenshtein similarity matching
-- **Decryption**: Primary + ShadeOfChaos fallback
-
-### Source 3: Consumet
-- **Flexible**: Multiple sub-providers
-- **Fallback**: When other sources unavailable
-
----
 
 ## 🚀 Performance Optimizations
 
@@ -230,8 +209,6 @@ const clientId = getEnv('CLIENT_ID');        // Automatically decrypted
 - ✅ Random IV for each encryption
 - ✅ Server-side only decryption
 - ✅ Backward compatible with plain text values
-
-For detailed encryption documentation, see [ENCRYPTION.md](ENCRYPTION.md).
 
 ---
 

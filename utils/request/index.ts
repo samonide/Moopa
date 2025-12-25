@@ -21,7 +21,10 @@ const pls = {
     ctx?: any
   ): Promise<any> {
     try {
-      const session: any | null = isAnilist(url) ? await getSession(ctx) : null;
+      // session is not currently used
+      if (isAnilist(url)) {
+        await getSession(ctx);
+      }
       const controller = new AbortController();
       const signal = controller.signal;
 

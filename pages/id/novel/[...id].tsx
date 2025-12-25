@@ -28,7 +28,7 @@ type NovelData = {
 
 export default function InfoNovel({ id, API }: InfoNovelProps) {
   const [data, setData] = useState<NovelData>();
-  const [loading, setLoading] = useState(true);
+  const [_loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchData() {

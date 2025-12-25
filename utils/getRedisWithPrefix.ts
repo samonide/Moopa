@@ -99,6 +99,7 @@ export async function getKeysWithNumericKeys() {
 }
 
 export async function countNumericKeys() {
+  if (!redis) return 0;
   const allKeys = await redis.keys("*"); // Fetch all keys in Redis
   const numericKeys = allKeys.filter((key) => /^\d+$/.test(key)); // Filter keys that contain only numbers
 

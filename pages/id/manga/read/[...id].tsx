@@ -21,7 +21,7 @@ interface ReadNovelProps {
   API: string;
 }
 
-export default function ReadNovel({ mangaId, chapterId, API }: ReadNovelProps) {
+export default function ReadNovel({ chapterId, API }: ReadNovelProps) {
   const [data, setData] = useState<DataType | null>();
   const [hideNav, setHideNav] = useState(false);
 

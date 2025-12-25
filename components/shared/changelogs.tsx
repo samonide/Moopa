@@ -235,7 +235,6 @@ export function ChangelogsVersions({
   version,
   pre,
   notes,
-  highlights,
   children
 }: ChangelogsVersionsProps) {
   return (

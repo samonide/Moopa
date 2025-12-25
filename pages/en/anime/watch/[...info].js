@@ -169,31 +169,17 @@ export default function Watch({
 }) {
   const router = useRouter();
 
-  // Show loading if info is not available
-  if (!info) {
-    return (
-      <div className="w-screen h-screen flex items-center justify-center bg-primary">
-        <div className="flex flex-col items-center gap-4">
-          <Spinner />
-          <p className="text-white font-karla">Loading anime information...</p>
-        </div>
-      </div>
-    );
-  }
-
+  // ✅ ALL HOOKS MUST BE HERE - before any conditional returns
   const [artStorage, setArtStorage] = useState(null);
-
   const [episodeNavigation, setEpisodeNavigation] = useState(null);
   const [episodesList, setepisodesList] = useState();
   const [mapEpisode, setMapEpisode] = useState(null);
-
   const [open, setOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [onList, setOnList] = useState(false);
 
   const { setAutoNext, ratingModalState, setRatingModalState } =
     useWatchProvider();
-
-  const [onList, setOnList] = useState(false);
 
   const {
     theaterMode,
@@ -495,6 +481,18 @@ export default function Watch({
   function handleClose() {
     setOpen(false);
     document.body.style.overflow = "auto";
+  }
+
+  // Show loading if info is not available
+  if (!info) {
+    return (
+      <div className="w-screen h-screen flex items-center justify-center bg-primary">
+        <div className="flex flex-col items-center gap-4">
+          <Spinner />
+          <p className="text-white font-karla">Loading anime information...</p>
+        </div>
+      </div>
+    );
   }
 
   return (

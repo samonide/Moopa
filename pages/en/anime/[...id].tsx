@@ -10,7 +10,6 @@ import AniList from "@/components/media/aniList";
 import ListEditor from "@/components/listEditor";
 
 import DetailTop from "@/components/anime/mobile/topSection";
-import AnimeEpisode from "@/components/anime/episode";
 import { useAniList } from "@/lib/anilist/useAnilist";
 import Footer from "@/components/shared/footer";
 import { mediaInfoQuery } from "@/lib/graphql/query";
@@ -35,11 +34,11 @@ export default function Info({ info, color, chapterNotFound }: InfoTypes) {
   const { data: session }: any = useSession();
   const { getUserLists } = useAniList(session);
 
-  const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState<number>(0);
   const [statuses, setStatuses] = useState<any>(null);
   const [domainUrl, setDomainUrl] = useState("");
-  const [watch, setWatch] = useState<string>();
+  const [_loading, setLoading] = useState(false);
+  const [watch, _setWatch] = useState<string>();
 
   const [open, setOpen] = useState(false);
   const { id } = useRouter().query;

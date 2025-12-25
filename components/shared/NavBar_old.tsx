@@ -1,6 +1,6 @@
 import { useSearch } from "@/lib/context/isOpenState";
 import { getCurrentSeason } from "@/utils/getTimes";
-import { ArrowLeftIcon, ArrowUpCircleIcon, MagnifyingGlassIcon } from "@heroicons/react/20/solid";
+import { ArrowLeftIcon, ArrowUpCircleIcon } from "@heroicons/react/20/solid";
 import { UserIcon } from "@heroicons/react/24/solid";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Image from "next/image";
@@ -8,7 +8,6 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { AniListInfoTypes } from "types/info/AnilistInfoTypes";
-import { cn } from "@/lib/utils";
 
 const getScrollPosition = (el: Window | Element = window) => {
   if (el instanceof Window) {
@@ -49,7 +48,6 @@ export function Navbar({
     { x: number; y: number } | undefined
   >();
   const { setIsOpen } = useSearch();
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   const year = new Date().getFullYear();
   const season = getCurrentSeason();
@@ -105,8 +103,8 @@ export function Navbar({
 
                 <span
                   className={`font-inter font-semibold w-[50%] line-clamp-1 select-none ${scrollPosition?.y ?? 0 >= scrollP + 80
-                      ? "opacity-100"
-                      : "opacity-0"
+                    ? "opacity-100"
+                    : "opacity-0"
                     } transition-all duration-200 ease-linear`}
                 >
                   {info.title.romaji}
@@ -270,8 +268,8 @@ export function Navbar({
             });
           }}
           className={`${scrollPosition?.y ?? 0 >= 180
-              ? "-translate-x-6 opacity-100"
-              : "translate-x-[100%] opacity-0"
+            ? "-translate-x-6 opacity-100"
+            : "translate-x-[100%] opacity-0"
             } transform transition-all duration-300 ease-in-out fixed bottom-24 lg:bottom-14 right-0 z-[500]`}
         >
           <ArrowUpCircleIcon className="w-10 h-10 text-white" />

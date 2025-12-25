@@ -1,4 +1,3 @@
-import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -27,7 +26,7 @@ interface InfoNovelProps {
 
 export default function InfoNovel({ id, API }: InfoNovelProps) {
   const [data, setData] = useState<DataType | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [_loading, setLoading] = useState<boolean>(true);
 
   const [filter, setFilter] = useState<string>("");
 

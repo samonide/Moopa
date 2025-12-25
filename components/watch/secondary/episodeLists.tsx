@@ -1,5 +1,4 @@
 import Skeleton from "react-loading-skeleton";
-import Image from "next/image";
 import Link from "next/link";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import { useRouter } from "next/router";
@@ -19,7 +18,6 @@ type EpisodeListsProps = {
 
 export default function EpisodeLists({
   info,
-  map,
   providerId,
   watchId,
   episode,
@@ -43,8 +41,8 @@ export default function EpisodeLists({
             );
           }}
           className={`flex items-center gap-2 px-4 py-2 rounded-lg font-karla font-semibold text-sm transition-all duration-200 ${track?.next
-              ? "bg-action hover:bg-action/90 text-white shadow-lg hover:shadow-xl hover:scale-105"
-              : "bg-secondary text-gray-500 cursor-not-allowed"
+            ? "bg-action hover:bg-action/90 text-white shadow-lg hover:shadow-xl hover:scale-105"
+            : "bg-secondary text-gray-500 cursor-not-allowed"
             }`}
         >
           Next Episode
@@ -102,8 +100,8 @@ export default function EpisodeLists({
                   }${dub ? `&dub=${dub}` : ""}`}
                 key={item.id}
                 className={`relative bg-secondary flex-center h-12 rounded-md scale-100 transition-all duration-200 ease-out font-karla font-semibold ${item.id == watchId
-                    ? "pointer-events-none ring-2 ring-action bg-action/20"
-                    : "cursor-pointer hover:scale-105 ring-0 hover:ring-2 hover:shadow-lg ring-white/50"
+                  ? "pointer-events-none ring-2 ring-action bg-action/20"
+                  : "cursor-pointer hover:scale-105 ring-0 hover:ring-2 hover:shadow-lg ring-white/50"
                   }`}
               >
                 {item.number}
@@ -112,8 +110,8 @@ export default function EpisodeLists({
                   (artStorage?.[item?.id] !== undefined && prog > 0) ? (
                   <span
                     className={`absolute bottom-0 left-0 h-1 rounded-b-md ${progress !== undefined && progress >= item?.number
-                        ? "bg-green-500"
-                        : "bg-red-500"
+                      ? "bg-green-500"
+                      : "bg-red-500"
                       }`}
                     style={{
                       width:

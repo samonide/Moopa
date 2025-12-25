@@ -1,5 +1,4 @@
-import { ChapterTitle, type ChapterTitleProps } from "@vidstack/react";
-import { ChevronLeftIcon, ChevronRightIcon } from "@vidstack/react/icons";
+import { ChapterTitle } from "@vidstack/react";
 
 export function ChapterTitleComponent() {
   return (

@@ -7,12 +7,10 @@ import { toast } from "sonner";
 import { Navbar } from "@/components/shared/NavBar";
 import pls from "@/utils/request";
 import { CurrentMediaTypes } from "..";
-import { AnimeCard } from "@/components/shared/AnimeCard";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { Card, CardContent } from "@/components/ui/Card";
 import { PencilIcon, ClockIcon, StarIcon } from "@heroicons/react/24/outline";
-import { cn } from "@/lib/utils";
 
 type MyListProps = {
   media: CurrentMediaTypes[];

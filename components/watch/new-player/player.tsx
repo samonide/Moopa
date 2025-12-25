@@ -97,7 +97,8 @@ export default function VidStack({
     playerState,
     dataMedia,
     autoNext,
-    setRatingModalState
+    setRatingModalState,
+    ratingModalState
   } = useWatchProvider();
 
   const { qualities, duration } = useMediaStore(player);
@@ -310,7 +311,7 @@ export default function VidStack({
 
   function onEnded() {
     if (!navigation?.next?.id) return;
-    if (autoNext === "on") {
+    if (autoNext === true) {
       const nextButton = document.querySelector(".next-button");
 
       let timeoutId: ReturnType<typeof setTimeout>;
@@ -375,11 +376,9 @@ export default function VidStack({
           });
 
           if (dataMedia.episodes === +navigation.playing?.number) {
-            setRatingModalState((prev: any) => {
-              return {
-                ...prev,
-                isOpen: true
-              };
+            setRatingModalState({
+              ...ratingModalState,
+              isOpen: true
             });
           }
         }
@@ -433,7 +432,7 @@ export default function VidStack({
         "Loading..."
       }
       streamType="on-demand"
-      load="config"
+      load="eager"
       crossOrigin="anonymous"
       onTimeUpdate={onTimeUpdate}
       playsInline
@@ -443,7 +442,8 @@ export default function VidStack({
       onLoadedMetadata={onLoadedMetadata}
       ref={player}
     >
-      <MediaProvider src={defaultQuality?.url || ""}>
+      <MediaProvider>
+        <source src={defaultQuality?.url || ""} type="application/x-mpegURL" />
         {track &&
           track?.subtitles &&
           track?.subtitles?.map((subtitle: Subtitle, index: number) => (
