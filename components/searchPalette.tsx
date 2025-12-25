@@ -80,7 +80,7 @@ export default function SearchPalette() {
       if (e.code === "KeyS" && e.ctrlKey) {
         // do your stuff
         e.preventDefault();
-        setIsOpen((prev: boolean) => !prev);
+        setIsOpen(!isOpen);
         setData(null);
         setQuery("");
       }
@@ -157,7 +157,7 @@ export default function SearchPalette() {
                             {type.toLowerCase()}
                             <ChevronDownIcon
                               className="ml-2 -mr-1 h-5 w-5 text-violet-200 hover:text-violet-100"
-                              // aria-hidden="true"
+                            // aria-hidden="true"
                             />
                           </Menu.Button>
                         </div>
@@ -177,11 +177,10 @@ export default function SearchPalette() {
                                   <button
                                     title="Anime"
                                     onClick={() => setType("ANIME")}
-                                    className={`${
-                                      active
+                                    className={`${active
                                         ? "bg-secondary text-white"
                                         : "text-white"
-                                    } group flex w-full items-center gap-3 rounded-md px-2 py-2 text-sm`}
+                                      } group flex w-full items-center gap-3 rounded-md px-2 py-2 text-sm`}
                                   >
                                     <PlayIcon className="w-6 h-6" />
                                     <span>Anime</span>
@@ -193,11 +192,10 @@ export default function SearchPalette() {
                                   <button
                                     title="Manga"
                                     onClick={() => setType("MANGA")}
-                                    className={`${
-                                      active
+                                    className={`${active
                                         ? "bg-secondary text-white"
                                         : "text-white"
-                                    } group flex w-full items-center gap-3 rounded-md px-2 py-2 text-sm`}
+                                      } group flex w-full items-center gap-3 rounded-md px-2 py-2 text-sm`}
                                   >
                                     <BookOpenIcon className="w-6 h-6" />
                                     <span>Manga</span>
@@ -230,48 +228,46 @@ export default function SearchPalette() {
                       <Fragment>
                         {data && data?.length > 0
                           ? data?.map((i) => (
-                              <Combobox.Option
-                                key={i.id}
-                                value={i.id}
-                                className={({ active }) =>
-                                  `flex items-center gap-3 p-5 ${
-                                    active ? "bg-primary/40 cursor-pointer" : ""
-                                  }`
-                                }
-                              >
-                                <div className="shrink-0">
-                                  <Image
-                                    src={i.coverImage.medium}
-                                    alt="coverImage"
-                                    width={100}
-                                    height={100}
-                                    className="w-16 h-16 object-cover rounded"
-                                  />
-                                </div>
-                                <div className="flex flex-col w-full h-full">
-                                  <h3 className="font-karla font-semibold">
-                                    {i.title.userPreferred}
-                                  </h3>
-                                  <p className="text-sm text-white/50">
-                                    {i.startDate.year} {getFormat(i.format)}
-                                  </p>
-                                </div>
-                              </Combobox.Option>
-                            ))
+                            <Combobox.Option
+                              key={i.id}
+                              value={i.id}
+                              className={({ active }) =>
+                                `flex items-center gap-3 p-5 ${active ? "bg-primary/40 cursor-pointer" : ""
+                                }`
+                              }
+                            >
+                              <div className="shrink-0">
+                                <Image
+                                  src={i.coverImage.medium}
+                                  alt="coverImage"
+                                  width={100}
+                                  height={100}
+                                  className="w-16 h-16 object-cover rounded"
+                                />
+                              </div>
+                              <div className="flex flex-col w-full h-full">
+                                <h3 className="font-karla font-semibold">
+                                  {i.title.userPreferred}
+                                </h3>
+                                <p className="text-sm text-white/50">
+                                  {i.startDate.year} {getFormat(i.format)}
+                                </p>
+                              </div>
+                            </Combobox.Option>
+                          ))
                           : !loading &&
-                            debounceSearch !== "" && (
-                              <p className="flex-center font-karla gap-3 p-5">
-                                No results found.
-                              </p>
-                            )}
+                          debounceSearch !== "" && (
+                            <p className="flex-center font-karla gap-3 p-5">
+                              No results found.
+                            </p>
+                          )}
                         {nextPage && (
                           <button
                             type="button"
                             title="View More"
                             onClick={() => {
                               router.push(
-                                `/en/search/${type.toLowerCase()}/${
-                                  query !== "" ? `?search=${query}` : ""
+                                `/en/search/${type.toLowerCase()}/${query !== "" ? `?search=${query}` : ""
                                 }`
                               );
                               setIsOpen(false);

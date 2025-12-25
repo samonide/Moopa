@@ -1,11 +1,17 @@
 /** @type {import('next').NextConfig} */
 // const nextSafe = require("next-safe");
 
-const withPWA = require("next-pwa")({
+const withPWA = require("@ducanh2912/next-pwa").default({
   dest: "public",
   register: true,
   disable: process.env.NODE_ENV === "development",
   skipWaiting: true,
+  cacheOnFrontEndNav: true,
+  aggressiveFrontEndNavCaching: true,
+  reloadOnOnline: true,
+  workboxOptions: {
+    disableDevLogs: true,
+  },
 });
 
 module.exports = withPWA({
@@ -15,29 +21,15 @@ module.exports = withPWA({
     return config;
   },
   images: {
-    unoptimized: true,
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "**.*.*",
-      },
-      {
-        protocol: "https",
-        hostname: "**.**.*.*",
-      },
-      {
-        protocol: "https",
-        hostname: "simkl.in",
-      },
-      {
-        protocol: "https",
-        hostname: "tenor.com",
-      },
-      {
-        protocol: "https",
-        hostname: "meionovel.id",
+        hostname: "**",
       },
     ],
+    formats: ["image/avif", "image/webp"],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
   },
   // distDir: process.env.BUILD_DIR || ".next",
   // Uncomment this if you want to use Docker
@@ -45,8 +37,8 @@ module.exports = withPWA({
   async redirects() {
     return [
       {
-        source: "/donate",
-        destination: "https://ko-fi.com/factiven",
+        source: "/github",
+        destination: "https://github.com/samonide/moopa",
         permanent: false,
         basePath: false,
       },

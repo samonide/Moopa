@@ -125,10 +125,8 @@ export function NextEpisode({
   const { dataMedia, track } = useWatchProvider();
   function handleNext() {
     router.push(
-      `/en/anime/watch/${dataMedia.id}/${track?.provider}?id=${
-        navigation?.next?.id
-      }&num=${navigation?.next?.number}${
-        track?.isDub ? `&dub=${track?.isDub}` : ""
+      `/en/anime/watch/${dataMedia.id}/${track?.provider}?id=${navigation?.next?.id
+      }&num=${navigation?.next?.number}${track?.isDub ? `&dub=${track?.isDub}` : ""
       }`
     );
   }
@@ -166,10 +164,8 @@ export function PreviousEpisode({
   const { dataMedia, track } = useWatchProvider();
   function handlePrev() {
     router.push(
-      `/en/anime/watch/${dataMedia.id}/${track?.provider}?id=${
-        navigation?.prev?.id
-      }&num=${navigation?.prev?.number}${
-        track?.isDub ? `&dub=${track?.isDub}` : ""
+      `/en/anime/watch/${dataMedia.id}/${track?.provider}?id=${navigation?.prev?.id
+      }&num=${navigation?.prev?.number}${track?.isDub ? `&dub=${track?.isDub}` : ""
       }`
     );
   }
@@ -204,9 +200,8 @@ export function MobilePlayButton({ tooltipPlacement, host }: MediaButtonProps) {
     Icon = ended ? ReplayIcon : isPaused ? PlayIcon : PauseIcon;
   return (
     <PlayButton
-      className={`${
-        host ? "" : "pointer-events-none"
-      } group ring-media-focus relative inline-flex h-16 w-16 media-paused:cursor-pointer cursor-default items-center justify-center rounded-full outline-none`}
+      className={`${host ? "" : "pointer-events-none"
+        } group ring-media-focus relative inline-flex h-16 w-16 media-paused:cursor-pointer cursor-default items-center justify-center rounded-full outline-none`}
     >
       <Icon className="w-10 h-10" />
     </PlayButton>
@@ -278,12 +273,12 @@ export function TheaterButton({ tooltipPlacement, offset }: MediaButtonProps) {
           type="button"
           className={buttonClass}
           onClick={() => {
-            setPlayerState((prev: any) => ({
-              ...prev,
-              currentTime: playerState,
+            setPlayerState({
+              ...playerState,
+              currentTime: playerState.currentTime,
               isPlaying: isPlaying
-            }));
-            setTheaterMode((prev: any) => !prev);
+            });
+            setTheaterMode(!theaterMode);
           }}
         >
           {!theaterMode ? (
@@ -342,10 +337,8 @@ export function PlayNextButton({
       onClick={() => {
         if (navigation?.next) {
           router.push(
-            `/en/anime/watch/${dataMedia.id}/${track.provider}?id=${
-              navigation?.next?.id
-            }&num=${navigation?.next?.number}${
-              track?.isDub ? `&dub=${track?.isDub}` : ""
+            `/en/anime/watch/${dataMedia.id}/${track.provider}?id=${navigation?.next?.id
+            }&num=${navigation?.next?.number}${track?.isDub ? `&dub=${track?.isDub}` : ""
             }`
           );
         }

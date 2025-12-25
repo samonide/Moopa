@@ -1,6 +1,6 @@
 import "@vidstack/react/player/styles/base.css";
 
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import style from "./player.module.css";
 
@@ -327,10 +327,8 @@ export default function VidStack({
         // console.log("time is up!");
         if (navigation?.next) {
           router.push(
-            `/en/anime/watch/${dataMedia.id}/${track.provider}?id=${
-              navigation?.next?.id
-            }&num=${navigation?.next?.number}${
-              track?.isDub ? `&dub=${track?.isDub}` : ""
+            `/en/anime/watch/${dataMedia.id}/${track.provider}?id=${navigation?.next?.id
+            }&num=${navigation?.next?.number}${track?.isDub ? `&dub=${track?.isDub}` : ""
             }`
           );
         }
@@ -392,8 +390,8 @@ export default function VidStack({
     const edButton = document.querySelector(".ed-button");
 
     const op: SkipData = track?.skip.find(
-        (item: SkipData) => item.text === "Opening"
-      ),
+      (item: SkipData) => item.text === "Opening"
+    ),
       ed = track?.skip.find((item: SkipData) => item.text === "Ending");
 
     if (
@@ -434,25 +432,22 @@ export default function VidStack({
         `Episode ${navigation?.playing?.number}` ||
         "Loading..."
       }
-      load="idle"
-      crossorigin="anonymous"
-      src={{
-        src: defaultQuality?.url,
-        type: "application/vnd.apple.mpegurl"
-      }}
+      streamType="on-demand"
+      load="config"
+      crossOrigin="anonymous"
       onTimeUpdate={onTimeUpdate}
-      playsinline
+      playsInline
       aspectRatio={aspectRatio}
       onEnd={onEnded}
       onSeeked={onSeeked}
       onLoadedMetadata={onLoadedMetadata}
       ref={player}
     >
-      <MediaProvider>
+      <MediaProvider src={defaultQuality?.url || ""}>
         {track &&
           track?.subtitles &&
-          track?.subtitles?.map((track: Subtitle) => (
-            <Track {...track} key={track.src} />
+          track?.subtitles?.map((subtitle: Subtitle, index: number) => (
+            subtitle?.src && <Track {...subtitle} key={subtitle.src || `subtitle-${index}`} />
           ))}
         {chapters?.length > 0 && (
           <Track key={chapters} src={chapters} kind="chapters" default={true} />

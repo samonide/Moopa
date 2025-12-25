@@ -1,5 +1,7 @@
 import { rateLimiterRedis, redis } from "@/lib/redis";
 import { getAnimeSource } from "@/lib/consumet/anime/source";
+import { getHiAnimeSource } from "@/lib/hianime/episodes";
+import { getAniCrushSource } from "@/lib/anicrush/episodes";
 import axios from "axios";
 
 async function consumetSource(id) {
@@ -26,6 +28,26 @@ async function anifySource(providerId, watchId, episode, id, sub) {
   }
 }
 
+async function hiAnimeSource(episodeId, server = "HD-1") {
+  try {
+    const data = await getHiAnimeSource(episodeId, server);
+    return data;
+  } catch (error) {
+    console.error("HiAnime source error:", error);
+    return { error: error.message };
+  }
+}
+
+async function anicrushSource(episodeId, server = "Southcloud-1") {
+  try {
+    const data = await getAniCrushSource(episodeId, server);
+    return data;
+  } catch (error) {
+    console.error("AniCrush source error:", error);
+    return { error: error.message };
+  }
+}
+
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ message: "Method not allowed" });
@@ -42,14 +64,35 @@ export default async function handler(req, res) {
     }
   }
 
-  const { source, providerId, watchId, episode, id, sub = "sub" } = req.body;
+  const { source, providerId, watchId, episode, id, sub = "sub", server } = req.body;
 
-  if (source === "anify") {
+  // Map source1, source2, etc. to actual provider names
+  const sourceMap = {
+    'source1': 'hianime',
+    'source2': 'anicrush',
+    'source3': 'consumet',
+  };
+
+  const mappedSource = sourceMap[source] || source;
+
+  if (mappedSource === "hianime") {
+    const data = await hiAnimeSource(watchId, server);
+    console.log("HiAnime source response:", JSON.stringify(data, null, 2));
+    return res.status(200).json(data);
+  }
+
+  if (mappedSource === "anicrush") {
+    const data = await anicrushSource(watchId, server);
+    console.log("AniCrush source response:", JSON.stringify(data, null, 2));
+    return res.status(200).json(data);
+  }
+
+  if (mappedSource === "anify") {
     const data = await anifySource(providerId, watchId, episode, id, sub);
     return res.status(200).json(data);
   }
 
-  if (source === "consumet") {
+  if (mappedSource === "consumet") {
     const data = await consumetSource(watchId);
     return res.status(200).json(data);
   }

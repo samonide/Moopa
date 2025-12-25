@@ -16,11 +16,15 @@ export default function ThumbnailOnly({
   let prog = (time / duration) * 100;
   if (prog > 90) prog = 100;
 
-  const parsedImage = episode?.img
-    ? episode?.img?.includes("null")
-      ? info.coverImage?.extraLarge
-      : episode?.img
-    : info.coverImage?.extraLarge || null;
+  // Determine image source - prioritize episode image, fallback to AniList cover
+  const getImageSource = () => {
+    if (!episode?.img || episode.img === "" || episode.img.includes("null") || episode.img.includes("s4.anilist.co")) {
+      return info.coverImage?.extraLarge || info.bannerImage || null;
+    }
+    return episode.img;
+  };
+
+  const parsedImage = getImageSource();
   return (
     <Link
       // key={index}
@@ -39,8 +43,8 @@ export default function ThumbnailOnly({
             progress && episode?.number <= progress
               ? "100%"
               : artStorage?.[episode?.id]
-              ? `${prog}%`
-              : "0%",
+                ? `${prog}%`
+                : "0%",
         }}
       />
       {/* <div className="absolute inset-0 bg-black z-30 opacity-20" /> */}

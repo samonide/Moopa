@@ -19,11 +19,15 @@ export default function ThumbnailDetail({
   let prog = (time / duration) * 100;
   if (prog > 90) prog = 100;
 
-  const parsedImage = epi?.img
-    ? epi?.img?.includes("null")
-      ? info.coverImage?.extraLarge
-      : epi?.img
-    : info.coverImage?.extraLarge || null;
+  // Determine image source - prioritize episode image, fallback to AniList cover
+  const getImageSource = () => {
+    if (!epi?.img || epi.img === "" || epi.img.includes("null") || epi.img.includes("s4.anilist.co")) {
+      return info.coverImage?.extraLarge || info.bannerImage || null;
+    }
+    return epi.img;
+  };
+
+  const parsedImage = getImageSource();
 
   return (
     <Link
@@ -56,8 +60,8 @@ export default function ThumbnailDetail({
                 progress !== undefined && progress >= epi?.number
                   ? "100%"
                   : artStorage?.[epi?.id] !== undefined
-                  ? `${prog}%`
-                  : "0%",
+                    ? `${prog}%`
+                    : "0%",
             }}
           />
           <span className="absolute bottom-2 left-2 font-karla font-semibold text-sm lg:text-lg">

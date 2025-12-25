@@ -1,6 +1,11 @@
 import { redis } from "@/lib/redis";
 
 export async function getValuesWithPrefix(prefix: string) {
+  if (!redis) {
+    console.warn("Redis is not available. Returning empty array.");
+    return [];
+  }
+
   let cursor = "0"; // Start at the beginning of the keyspace
   let values = [];
 
@@ -29,6 +34,11 @@ export async function getValuesWithPrefix(prefix: string) {
 }
 
 export async function countKeysWithPrefix(prefix: string) {
+  if (!redis) {
+    console.warn("Redis is not available. Returning 0.");
+    return 0;
+  }
+
   let cursor = "0"; // Start at the beginning of the keyspace
   let count = 0;
 
@@ -52,6 +62,11 @@ export async function countKeysWithPrefix(prefix: string) {
 }
 
 export async function getValuesWithNumericKeys() {
+  if (!redis) {
+    console.warn("Redis is not available. Returning empty array.");
+    return [];
+  }
+
   const allKeys = await redis.keys("*"); // Fetch all keys in Redis
   const numericKeys = allKeys.filter((key) => /^\d+$/.test(key)); // Filter keys that contain only numbers
 
@@ -66,6 +81,11 @@ export async function getValuesWithNumericKeys() {
 }
 
 export async function getKeysWithNumericKeys() {
+  if (!redis) {
+    console.warn("Redis is not available. Skipping deletion.");
+    return;
+  }
+
   const allKeys = await redis.keys("*"); // Fetch all keys in Redis
   const numericKeys = allKeys.filter((key) => /^\d+$/.test(key)); // Filter keys that contain only numbers
 

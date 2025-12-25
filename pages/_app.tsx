@@ -13,6 +13,7 @@ import { unixTimestampToRelativeTime } from "@/utils/getTimes";
 // import SecretPage from "@/components/secret";
 import { Toaster, toast } from "sonner";
 import ChangeLogs from "../components/shared/changelogs";
+import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
 import type { AppProps } from "next/app";
 
 export default function App({
@@ -35,12 +36,10 @@ export default function App({
         if (data?.show === true) {
           toast.message(`Update Notice!`, {
             position: "bottom-right",
-            important: true,
             duration: 100000,
             className: "font-karla",
-            description: `${data.message} ${
-              data?.startAt ? unixTimestampToRelativeTime(data.startAt) : ""
-            }`,
+            description: `${data.message} ${data?.startAt ? unixTimestampToRelativeTime(data.startAt) : ""
+              }`,
           });
         }
       } catch (err) {
@@ -56,50 +55,52 @@ export default function App({
 
   return (
     <>
-      <SessionProvider session={session}>
-        <SearchProvider>
-          <WatchPageProvider>
-            <AnimatePresence mode="wait">
-              <SkeletonTheme baseColor="#232329" highlightColor="#2a2a32">
-                <Toaster richColors theme="dark" closeButton />
-                {/* <SecretPage
+      <ErrorBoundary>
+        <SessionProvider session={session}>
+          <SearchProvider>
+            <WatchPageProvider>
+              <AnimatePresence mode="wait">
+                <SkeletonTheme baseColor="#232329" highlightColor="#2a2a32">
+                  <Toaster richColors theme="dark" closeButton />
+                  {/* <SecretPage
                   cheatCode={"aofienaef"}
                   onCheatCodeEntered={handleCheatCodeEntered}
                 /> */}
-                <ChangeLogs />
-                <m.div
-                  key={`route-${router.route}`}
-                  transition={{ duration: 0.5 }}
-                  initial="initialState"
-                  animate="animateState"
-                  exit="exitState"
-                  variants={{
-                    initialState: {
-                      opacity: 0,
-                    },
-                    animateState: {
-                      opacity: 1,
-                    },
-                    exitState: {},
-                  }}
-                  className="z-50 w-screen"
-                >
-                  <NextNProgress
-                    color="#FF7E2C"
-                    startPosition={0.3}
-                    stopDelayMs={200}
-                    height={3}
-                    showOnShallow={true}
-                  />
+                  <ChangeLogs />
+                  <m.div
+                    key={`route-${router.route}`}
+                    transition={{ duration: 0.5 }}
+                    initial="initialState"
+                    animate="animateState"
+                    exit="exitState"
+                    variants={{
+                      initialState: {
+                        opacity: 0,
+                      },
+                      animateState: {
+                        opacity: 1,
+                      },
+                      exitState: {},
+                    }}
+                    className="z-50 w-screen"
+                  >
+                    <NextNProgress
+                      color="#90e0ef"
+                      startPosition={0.3}
+                      stopDelayMs={200}
+                      height={3}
+                      showOnShallow={true}
+                    />
 
-                  <SearchPalette />
-                  <Component {...pageProps} />
-                </m.div>
-              </SkeletonTheme>
-            </AnimatePresence>
-          </WatchPageProvider>
-        </SearchProvider>
-      </SessionProvider>
+                    <SearchPalette />
+                    <Component {...pageProps} />
+                  </m.div>
+                </SkeletonTheme>
+              </AnimatePresence>
+            </WatchPageProvider>
+          </SearchProvider>
+        </SessionProvider>
+      </ErrorBoundary>
     </>
   );
 }

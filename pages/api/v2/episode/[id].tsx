@@ -8,6 +8,8 @@ import { AnifyEpisode, ConsumetInfo, EpisodeData } from "types";
 import { Episode } from "@/types/api/Episode";
 import { getProviderWithMostEpisodesAndImage } from "@/utils/parseMetaData";
 import { getAnimeEpisode } from "@/lib/consumet/anime/episodes";
+import { fetchHiAnimeEpisodes } from "@/lib/hianime/episodes";
+import { fetchAniCrushEpisodes } from "@/lib/anicrush/episodes";
 
 const isAscending = (data: Episode[]) => {
   for (let i = 1; i < data.length; i++) {
@@ -55,7 +57,7 @@ async function fetchConsumet(id?: string | string[] | undefined) {
   try {
     const fetchData = async (dub?: any) => {
       const data = await getAnimeEpisode(id, dub);
-      
+
       if (data?.message === "Anime not found" && data?.length < 1) {
         return [];
       }
@@ -81,7 +83,7 @@ async function fetchConsumet(id?: string | string[] | undefined) {
       fetchData(true)
     ]);
 
-    if (subData.every((i) => i.id?.includes("dub"))) {
+    if (subData && Array.isArray(subData) && subData.every((i) => i.id?.includes("dub"))) {
       // replace dub in title with sub
       subData.forEach((item) => {
         if (item.id?.includes("dub")) {
@@ -96,8 +98,8 @@ async function fetchConsumet(id?: string | string[] | undefined) {
         map: true,
         providerId: "gogoanime",
         episodes: {
-          sub: isAscending(subData) ? subData : subData.reverse(),
-          dub: isAscending(dubData) ? dubData : dubData.reverse()
+          sub: isAscending(subData || []) ? (subData || []) : (subData || []).reverse(),
+          dub: isAscending(dubData || []) ? (dubData || []) : (dubData || []).reverse()
         }
       }
     ];
@@ -126,6 +128,108 @@ async function fetchAnify(id?: string) {
     return filtered;
   } catch (error: any) {
     console.error("Error fetching and processing data:", error.message);
+    return [];
+  }
+}
+
+async function fetchHiAnime(id?: string) {
+  try {
+    // Fetch anime info from AniList to get titles and start date
+    const { data: anilistData } = await axios.post(
+      "https://graphql.anilist.co/",
+      {
+        query: `
+          query ($id: Int) {
+            Media(id: $id, type: ANIME) {
+              id
+              title {
+                romaji
+                english
+                native
+              }
+              startDate {
+                year
+                month
+                day
+              }
+            }
+          }
+        `,
+        variables: { id: parseInt(id || "0") }
+      }
+    );
+
+    const media = anilistData?.data?.Media;
+    if (!media) {
+      console.error("Could not fetch anime info from AniList");
+      return [];
+    }
+
+    // Use the best available title
+    const searchTitle = media.title.english || media.title.romaji;
+
+    const hiAnimeData = await fetchHiAnimeEpisodes(
+      id || "",
+      searchTitle,
+      media.title.romaji,
+      media.title.english,
+      media.startDate
+    );
+
+    return [hiAnimeData];
+  } catch (error: any) {
+    console.error("Error fetching HiAnime data:", error.message);
+    return [];
+  }
+}
+
+async function fetchAniCrush(id?: string) {
+  try {
+    // Fetch anime info from AniList to get titles and start date
+    const { data: anilistData } = await axios.post(
+      "https://graphql.anilist.co/",
+      {
+        query: `
+          query ($id: Int) {
+            Media(id: $id, type: ANIME) {
+              id
+              title {
+                romaji
+                english
+                native
+              }
+              startDate {
+                year
+                month
+                day
+              }
+            }
+          }
+        `,
+        variables: { id: parseInt(id || "0") }
+      }
+    );
+
+    const media = anilistData?.data?.Media;
+    if (!media) {
+      console.error("Could not fetch anime info from AniList");
+      return [];
+    }
+
+    // Use the best available title
+    const searchTitle = media.title.english || media.title.romaji;
+
+    const anicrushData = await fetchAniCrushEpisodes(
+      id || "",
+      searchTitle,
+      media.title.romaji,
+      media.title.english,
+      media.startDate
+    );
+
+    return [anicrushData];
+  } catch (error: any) {
+    console.error("Error fetching AniCrush data:", error.message);
     return [];
   }
 }
@@ -245,9 +349,11 @@ export default async function handler(
         .send(filtered?.filter((i) => i?.providerId !== "9anime"));
     }
   } else {
-    const [consumet, anify, cover] = await Promise.all([
+    const [consumet, anify, hiAnime, anicrush, cover] = await Promise.all([
       fetchConsumet(id),
       fetchAnify(id),
+      fetchHiAnime(id),
+      fetchAniCrush(id),
       fetchCoverImage(id, meta)
     ]);
 
@@ -256,7 +362,7 @@ export default async function handler(
       subDub = "dub";
     }
 
-    const rawData = [...consumet, ...anify];
+    const rawData = [...hiAnime, ...anicrush, ...consumet, ...anify];
 
     const filteredData = filterData(rawData, subDub);
 

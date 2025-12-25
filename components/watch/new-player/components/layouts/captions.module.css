@@ -1,5 +1,5 @@
 .captions {
-  @apply font-roboto font-medium;
+  @apply font-inter font-medium;
   /* Recommended settings in the WebVTT spec (https://www.w3.org/TR/webvtt1). */
   /* --cue-color: var(--media-cue-color, white); */
   /* --cue-color: white; */

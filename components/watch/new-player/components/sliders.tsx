@@ -7,12 +7,6 @@ export function Volume() {
         <VolumeSlider.TrackFill className="bg-white absolute h-full w-[var(--slider-fill)] rounded-sm will-change-[width]" />
       </VolumeSlider.Track>
 
-      <VolumeSlider.Preview
-        className="flex flex-col items-center opacity-0 transition-opacity duration-200 data-[visible]:opacity-100"
-        noClamp
-      >
-        <VolumeSlider.Value className="rounded-sm bg-black px-2 py-px text-[13px] font-medium" />
-      </VolumeSlider.Preview>
       <VolumeSlider.Thumb className="absolute left-[var(--slider-fill)] top-1/2 z-20 h-[15px] w-[15px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#cacaca] bg-white opacity-0 ring-white/40 transition-opacity group-data-[active]:opacity-100 group-data-[dragging]:ring-4 will-change-[left]" />
     </VolumeSlider.Root>
   );
@@ -26,9 +20,8 @@ export interface TimeSliderProps {
 export function Time({ thumbnails, host }: TimeSliderProps) {
   return (
     <TimeSlider.Root
-      className={`${
-        host ? "" : "pointer-events-none"
-      } time-slider group relative mx-[7.5px] inline-flex h-7 w-full cursor-pointer touch-none select-none items-center outline-none`}
+      className={`${host ? "" : "pointer-events-none"
+        } time-slider group relative mx-[7.5px] inline-flex h-7 w-full cursor-pointer touch-none select-none items-center outline-none`}
     >
       <TimeSlider.Chapters className="relative flex h-full w-full items-center rounded-[1px]">
         {(cues, forwardRef) =>
@@ -65,8 +58,6 @@ export function Time({ thumbnails, host }: TimeSliderProps) {
         ) : null}
 
         <TimeSlider.ChapterTitle className="mt-2 text-sm" />
-
-        <TimeSlider.Value className="text-[13px]" />
       </TimeSlider.Preview>
     </TimeSlider.Root>
   );

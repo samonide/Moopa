@@ -1,6 +1,10 @@
 {
   "compilerOptions": {
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -13,12 +17,28 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "baseUrl": ".",
+    "forceConsistentCasingInFileNames": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
     "paths": {
-      "@/components/*": ["components/*"],
-      "@/utils/*": ["utils/*"],
-      "@/lib/*": ["lib/*"],
-      "@/prisma/*": ["prisma/*"]
-    }
+      "@/components/*": [
+        "components/*"
+      ],
+      "@/utils/*": [
+        "utils/*"
+      ],
+      "@/lib/*": [
+        "lib/*"
+      ],
+      "@/prisma/*": [
+        "prisma/*"
+      ],
+      "@/types/*": [
+        "types/*"
+      ]
+    },
+    "target": "ES2017"
   },
   "include": [
     "next-env.d.ts",
@@ -29,5 +49,7 @@
     "pages/middleware.js",
     "pages/api/auth/[...nextauth].ts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules"
+  ]
 }

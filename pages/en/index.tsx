@@ -20,6 +20,7 @@ import { redis } from "@/lib/redis";
 import { Navbar } from "@/components/shared/NavBar";
 import UserRecommendation from "@/components/home/recommendation";
 import { useRouter } from "next/router";
+import { HeroCarousel } from "@/components/home/HeroCarousel";
 
 export async function getServerSideProps() {
   let cachedData;
@@ -29,7 +30,7 @@ export async function getServerSideProps() {
   }
 
   if (cachedData) {
-    const { genre, detail, populars, firstTrend } = JSON.parse(cachedData);
+    const { genre, detail, populars, firstTrend, trendingCarousel } = JSON.parse(cachedData);
     const upComing = await getUpcomingAnime();
     return {
       props: {
@@ -38,6 +39,7 @@ export async function getServerSideProps() {
         populars,
         upComing,
         firstTrend,
+        trendingCarousel: trendingCarousel || detail.data.slice(0, 5),
       },
     };
   } else {
@@ -59,6 +61,7 @@ export async function getServerSideProps() {
           detail: trendingDetail.props,
           populars: popularDetail.props,
           firstTrend: trendingDetail.props.data[0],
+          trendingCarousel: trendingDetail.props.data.slice(0, 5),
         }), // set cache for 2 hours
         "EX",
         60 * 60 * 2
@@ -74,6 +77,7 @@ export async function getServerSideProps() {
         populars: popularDetail.props,
         upComing,
         firstTrend: trendingDetail.props.data[0],
+        trendingCarousel: trendingDetail.props.data.slice(0, 5),
       },
     };
   }
@@ -85,6 +89,7 @@ type HomeProps = {
   populars: any;
   upComing: any;
   firstTrend: any;
+  trendingCarousel: any[];
 };
 
 export interface SessionTypes {
@@ -116,6 +121,7 @@ export default function Home({
   populars,
   upComing,
   firstTrend,
+  trendingCarousel,
 }: HomeProps) {
   const { data: sessions }: any = useSession();
   const userSession: SessionTypes = sessions?.user;
@@ -383,43 +389,13 @@ export default function Home({
       </Head>
       <MobileNav hideProfile={true} />
 
-      <Navbar paddingY="pt-2 lg:pt-10" withNav={true} home={true} />
-      <div className="h-auto w-screen bg-[#141519] text-[#dbdcdd]">
-        <div className="hidden lg:flex w-full justify-center my-16">
-          <div className="flex justify-between w-[80%] h-[470px]">
-            <div className="flex flex-col items-start justify-center w-[55%] gap-5">
-              <p className="font-outfit font-extrabold text-[34px] line-clamp-2 leading-10">
-                {firstTrend?.title?.english || firstTrend?.title?.romaji}
-              </p>
-              <p className="font-roboto font-light lg:text-[18px] line-clamp-3 tracking-wide">
-                {removeHtmlTags(firstTrend?.description)}
-              </p>
-              {firstTrend && (
-                <button
-                  onClick={() => {
-                    router.push(`/en/anime/${firstTrend?.id}`);
-                  }}
-                  className="p-3 text-md font-karla font-light ring-1 ring-action/50 rounded"
-                >
-                  START WATCHING
-                </button>
-              )}
-            </div>
-            <div className="relative block h-[467px] w-[322px]">
-              <div className="absolute bg-gradient-to-t from-primary to-transparent w-full h-full inset-0 z-20" />
-              <Image
-                src={firstTrend?.coverImage?.extraLarge || firstTrend?.image}
-                alt={`cover ${
-                  firstTrend?.title?.english || firstTrend?.title?.romaji
-                }`}
-                fill
-                sizes="100%"
-                quality={100}
-                className="object-cover rounded z-10"
-              />
-            </div>
-          </div>
-        </div>
+      <div className="h-auto w-screen bg-primary text-[#dbdcdd] pt-16 lg:pt-20">
+        <Navbar paddingY="py-4" withNav={true} home={true} />
+
+        {/* Modern Hero Carousel */}
+        {trendingCarousel && trendingCarousel.length > 0 && (
+          <HeroCarousel animeList={trendingCarousel} />
+        )}
 
         {sessions && (
           <div className="flex items-center justify-center lg:bg-none mt-4 lg:mt-0 w-screen">

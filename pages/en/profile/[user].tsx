@@ -7,6 +7,12 @@ import { toast } from "sonner";
 import { Navbar } from "@/components/shared/NavBar";
 import pls from "@/utils/request";
 import { CurrentMediaTypes } from "..";
+import { AnimeCard } from "@/components/shared/AnimeCard";
+import { Button } from "@/components/ui/Button";
+import { Badge } from "@/components/ui/Badge";
+import { Card, CardContent } from "@/components/ui/Card";
+import { PencilIcon, ClockIcon, StarIcon } from "@heroicons/react/24/outline";
+import { cn } from "@/lib/utils";
 
 type MyListProps = {
   media: CurrentMediaTypes[];
@@ -24,7 +30,6 @@ export default function MyList({
   userSettings,
 }: MyListProps) {
   const [listFilter, setListFilter] = useState("all");
-  const [visible, setVisible] = useState(false);
   const [useCustomList, setUseCustomList] = useState(true);
 
   useEffect(() => {
@@ -34,9 +39,8 @@ export default function MyList({
     }
   }, [userSettings]);
 
-  // Function to handle checkbox state changes
   const handleCheckboxChange = async () => {
-    setUseCustomList(!useCustomList); // Toggle the checkbox state
+    setUseCustomList(!useCustomList);
     try {
       const res = await fetch("/api/user/profile", {
         method: "PUT",
@@ -66,310 +70,253 @@ export default function MyList({
     }
     return media.filter((m: { name: string }) => m.name === status);
   };
+
   return (
     <>
       <Head>
-        <title>My Lists</title>
+        <title>{user.name}'s Profile - Moopa</title>
       </Head>
 
-      <Navbar withNav toTop shrink bgHover scrollP={110} paddingY={"py-1"} />
+      <Navbar withNav toTop shrink bgHover scrollP={110} paddingY={"py-4"} />
 
-      <div className="w-screen lg:flex justify-between lg:px-10 xl:px-32 py-5 mt-10 xl:mt-16 relative">
-        <div className="lg:w-[30%] h-full mt-12 lg:mr-10 grid gap-5 mx-3 lg:mx-0 antialiased">
-          <div className="flex items-center gap-5">
+      <div className="min-h-screen bg-primary pt-20 lg:pt-24">
+        {/* Banner */}
+        {user.bannerImage && (
+          <div className="relative w-full h-48 lg:h-64">
             <Image
-              src={user.avatar.large}
-              alt="user avatar"
-              width={1000}
-              height={1000}
-              className="object-cover h-28 w-28 rounded-lg"
+              src={user.bannerImage}
+              alt="banner"
+              fill
+              priority
+              className="object-cover brightness-50"
             />
-            {user.bannerImage ? (
-              <Image
-                src={user.bannerImage}
-                alt="image"
-                width={1000}
-                height={1000}
-                priority
-                className="absolute w-screen h-[240px] object-cover -top-[7.75rem] left-0 -z-50 brightness-[65%]"
-              />
-            ) : (
-              <div className="absolute w-screen h-[240px] object-cover -top-[7.75rem] left-0 -z-50 brightness-[65%] bg-image" />
-            )}
-            <h1 className="font-karla font-bold text-2xl pt-7">{user.name}</h1>
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-primary" />
           </div>
-          <div className="flex items-center justify-between">
-            <div className="flex gap-2 text-sm font-karla">
-              Created At :
-              <UnixTimeConverter unixTime={user.createdAt} />
-            </div>
-            <div className="flex items-center gap-2">
-              {sessions && user.name === sessions?.user.name ? (
-                <Link
-                  href={"https://anilist.co/settings/"}
-                  className="flex items-center gap-2 p-1 px-2 ring-[1px] antialiased ring-txt rounded-lg text-xs font-karla hover:bg-txt hover:shadow-lg group"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="w-4 h-4 group-hover:stroke-black"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.994 15.994 0 011.622-3.395m3.42 3.42a15.995 15.995 0 004.764-4.648l3.876-5.814a1.151 1.151 0 00-1.597-1.597L14.146 6.32a15.996 15.996 0 00-4.649 4.763m3.42 3.42a6.776 6.776 0 00-3.42-3.42"
-                    />
-                  </svg>
-                  <span className="group-hover:text-black">Edit Profile</span>
-                </Link>
-              ) : null}
-            </div>
-          </div>
-          <div className="bg-secondary lg:min-h-[160px] text-xs rounded-md p-4 font-karla">
-            <div>
-              {user.about ? (
-                <div dangerouslySetInnerHTML={{ __html: user.about }} />
-              ) : (
-                "No description created."
-              )}
-            </div>
-          </div>
+        )}
 
-          <div className="bg-secondary font-karla rounded-md h-20 p-1 grid grid-cols-3 place-items-center text-center text-txt">
-            <div>
-              <h1 className="text-action font-bold">
-                {user.statistics.anime.episodesWatched}
-              </h1>
-              <h2 className="text-sm">Total Episodes</h2>
-            </div>
-            <div>
-              <h1 className="text-action font-bold">
-                {user.statistics.anime.count}
-              </h1>
-              <h2 className="text-sm">Total Anime</h2>
-            </div>
-            {time?.days ? (
-              <div>
-                <h1 className="text-action font-bold">{time.days}</h1>
-                <h2 className="text-sm">Days Watched</h2>
-              </div>
-            ) : (
-              <div>
-                <h1 className="text-action font-bold">{time.hours}</h1>
-                <h2 className="text-sm">hours</h2>
-              </div>
-            )}
-          </div>
-          {sessions && user.name === sessions?.user.name && (
-            <div className="font-karla flex flex-col gap-4">
-              <h1>User Settings</h1>
-              <div className="flex p-2 items-center justify-between">
-                <h2
-                  className="text-sm text-white/70"
-                  title="Disabling this will stop adding your Anime to 'Watched using Moopa' list."
-                >
-                  Custom Lists
-                </h2>
-                <div className="w-5 h-5">
-                  <input
-                    type="checkbox"
-                    checked={useCustomList}
-                    onChange={handleCheckboxChange}
-                    className="accent-action"
-                  />
-                </div>
+        <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ${user.bannerImage ? '-mt-16 lg:-mt-20' : ''}`}>{/* Profile Header */}
+          {/* Profile Header */}
+          <div className="flex flex-col lg:flex-row gap-6 mb-8">
+            {/* Avatar & Basic Info */}
+            <div className="flex-shrink-0">
+              <div className="relative w-32 h-32 lg:w-40 lg:h-40 rounded-xl overflow-hidden ring-4 ring-primary shadow-2xl">
+                <Image
+                  src={user.avatar.large}
+                  alt={user.name}
+                  fill
+                  className="object-cover"
+                />
               </div>
             </div>
-          )}
-          {media.length !== 0 && (
-            <div className="font-karla grid gap-4">
-              <div className="flex md:justify-normal justify-between items-center">
-                <div className="flex items-center gap-3">
-                  <h1>Lists Filter</h1>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="w-[20px] h-[20px]"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z"
-                    />
-                  </svg>
-                </div>
-                <div
-                  className="md:hidden bg-secondary p-1 rounded-md cursor-pointer"
-                  onClick={() => setVisible(!visible)}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="w-6 h-6"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M6.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM12.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM18.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"
-                    />
-                  </svg>
-                </div>
-              </div>
-              <ul
-                className={`group md:grid gap-1 text-sm ${
-                  visible ? "" : "hidden"
-                }`}
-              >
-                <li
-                  onClick={() => setListFilter("all")}
-                  className={`p-2 cursor-pointer hover:text-action ${
-                    listFilter === "all" && "bg-secondary text-action"
-                  }`}
-                >
-                  <h1 className={`cursor-pointer hover:text-action`}>
-                    Show All
+
+            <div className="flex-1 space-y-4">
+              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                <div>
+                  <h1 className="text-3xl lg:text-4xl font-bold text-white font-outfit">
+                    {user.name}
                   </h1>
-                </li>
-                {media.map((item) => (
-                  <li
-                    key={item.name}
-                    onClick={() => setListFilter(item.name)}
-                    className={`cursor-pointer hover:text-action flex gap-2 p-2 duration-200 ${
-                      item.name === listFilter && "bg-secondary text-action"
-                    }`}
-                  >
-                    <h1 className="">{item.name}</h1>
-                    <div className="text-gray-400 opacity-0 invisible duration-200 transition-all group-hover:visible group-hover:opacity-100">
-                      ({item.entries.length})
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </div>
-
-        <div className="lg:w-[75%] grid gap-10 my-5 lg:my-12 lg:pt-16">
-          {media.length !== 0 ? (
-            filterMedia(listFilter).map((item, index) => {
-              return (
-                <div
-                  key={index}
-                  id={item.status?.toLowerCase()}
-                  className="flex flex-col gap-5 mx-3"
-                >
-                  <h1 className="font-karla font-bold text-xl">{item.name}</h1>
-                  <table className="bg-secondary rounded-lg">
-                    <thead>
-                      <tr>
-                        <th className="font-bold text-xs py-3 text-start pl-10 lg:w-[75%] w-[65%]">
-                          Title
-                        </th>
-                        <th className="font-bold text-xs py-3">Score</th>
-                        <th className="font-bold text-xs py-3">Progress</th>
-                      </tr>
-                    </thead>
-                    <tbody className="">
-                      {item.entries.map((item) => {
-                        return (
-                          <tr
-                            key={item.mediaId}
-                            className="hover:bg-orange-400 duration-150 ease-in-out group relative"
-                          >
-                            <td className="font-medium py-2 pl-2 rounded-l-lg">
-                              <div className="flex items-center gap-2">
-                                {item.media.status === "RELEASING" ? (
-                                  <span className="dot group-hover:invisible bg-green-500 shrink-0" />
-                                ) : item.media.status === "NOT_YET_RELEASED" ? (
-                                  <span className="dot group-hover:invisible bg-red-500 shrink-0" />
-                                ) : (
-                                  <span className="dot group-hover:invisible shrink-0" />
-                                )}
-                                <Image
-                                  src={item.media.coverImage.large}
-                                  alt="Cover Image"
-                                  width={500}
-                                  height={500}
-                                  className="object-cover rounded-md w-10 h-10 shrink-0"
-                                />
-                                <div className="absolute -top-10 -left-40 invisible lg:group-hover:visible">
-                                  <Image
-                                    src={item.media.coverImage.large}
-                                    alt={String(item.media.id)}
-                                    width={1000}
-                                    height={1000}
-                                    className="object-cover h-[186px] w-[140px] shrink-0 rounded-md"
-                                  />
-                                </div>
-                                <Link
-                                  href={`/en/anime/${item.media.id}`}
-                                  className="font-semibold font-karla pl-2 text-sm line-clamp-1"
-                                  title={item.media.title.romaji}
-                                >
-                                  {item.media.title.romaji}
-                                </Link>
-                              </div>
-                            </td>
-                            <td className="text-center text-xs text-txt">
-                              {item.score === 0 ? null : item.score}
-                            </td>
-                            <td className="text-center text-xs text-txt rounded-r-lg">
-                              {item.progress === item.media.episodes
-                                ? item.progress
-                                : item.media.episodes === null
-                                ? item.progress
-                                : `${item.progress}/${item.media.episodes}`}
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
+                  <p className="text-white/60 text-sm mt-1">
+                    Member since <UnixTimeConverter unixTime={user.createdAt} />
+                  </p>
                 </div>
-              );
-            })
-          ) : (
-            <div className="w-screen lg:w-full flex-center flex-col gap-5">
-              {user.name === sessions?.user.name ? (
-                <p className="text-center font-karla font-bold lg:text-lg">
-                  Oops!<br></br> Looks like you haven't watch anything yet.
-                </p>
-              ) : (
-                <p className="text-center font-karla font-bold lg:text-lg">
-                  Oops!<br></br> It looks like this user haven't watch anything
-                  yet.
-                </p>
+
+                {sessions && user.name === sessions?.user.name && (
+                  <Link href="https://anilist.co/settings/">
+                    <Button
+                      variant="outline"
+                      size="md"
+                      leftIcon={<PencilIcon className="w-4 h-4" />}
+                    >
+                      Edit Profile
+                    </Button>
+                  </Link>
+                )}
+              </div>
+
+              {/* Stats Cards */}
+              <div className="grid grid-cols-3 gap-3 lg:gap-4">
+                <Card className="bg-secondary-light/50 border-white/5 hover:border-brand-500/30 transition-colors">
+                  <CardContent className="p-4 text-center">
+                    <div className="flex items-center justify-center gap-2 mb-1">
+                      <ClockIcon className="w-4 h-4 text-brand-400" />
+                      <p className="text-2xl font-bold text-white">
+                        {user.statistics.anime.episodesWatched}
+                      </p>
+                    </div>
+                    <p className="text-xs text-white/60">Total Episodes</p>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-secondary-light/50 border-white/5 hover:border-brand-500/30 transition-colors">
+                  <CardContent className="p-4 text-center">
+                    <div className="flex items-center justify-center gap-2 mb-1">
+                      <StarIcon className="w-4 h-4 text-brand-400" />
+                      <p className="text-2xl font-bold text-white">
+                        {user.statistics.anime.count}
+                      </p>
+                    </div>
+                    <p className="text-xs text-white/60">Total Anime</p>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-secondary-light/50 border-white/5 hover:border-brand-500/30 transition-colors">
+                  <CardContent className="p-4 text-center">
+                    <p className="text-2xl font-bold text-white mb-1">
+                      {time?.days || time?.hours}
+                    </p>
+                    <p className="text-xs text-white/60">
+                      {time?.days ? "Days" : "Hours"} Watched
+                    </p>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* About */}
+              {user.about && (
+                <Card className="bg-secondary-light/50 border-white/5">
+                  <CardContent className="p-4">
+                    <div
+                      className="text-sm text-white/70 line-clamp-3"
+                      dangerouslySetInnerHTML={{ __html: user.about }}
+                    />
+                  </CardContent>
+                </Card>
               )}
-              <Link
-                href="/en/search/anime"
-                className="flex gap-2 text-sm ring-1 ring-action p-2 rounded-lg font-karla"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="w-5 h-5"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
-                  />
-                </svg>
-                <span>Start Watching</span>
-              </Link>
             </div>
+          </div>
+
+          {/* Filters & Settings */}
+          <div className="flex flex-col lg:flex-row gap-4 mb-6">
+            {/* List Filters */}
+            <div className="flex-1">
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  variant={listFilter === "all" ? "primary" : "ghost"}
+                  size="sm"
+                  onClick={() => setListFilter("all")}
+                >
+                  Show All
+                </Button>
+                {media.map((item) => (
+                  <Button
+                    key={item.name}
+                    variant={listFilter === item.name ? "primary" : "ghost"}
+                    size="sm"
+                    onClick={() => setListFilter(item.name)}
+                  >
+                    {item.name}{" "}
+                    <Badge variant="ghost" className="ml-2">
+                      {item.entries.length}
+                    </Badge>
+                  </Button>
+                ))}
+              </div>
+            </div>
+
+            {/* Custom List Toggle */}
+            {sessions && user.name === sessions?.user.name && (
+              <div className="flex items-center gap-3 px-4 py-2 bg-secondary-light/50 rounded-lg border border-white/5">
+                <span className="text-sm text-white/70">Custom Lists</span>
+                <input
+                  type="checkbox"
+                  checked={useCustomList}
+                  onChange={handleCheckboxChange}
+                  className="w-5 h-5 rounded accent-brand-500 cursor-pointer"
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Anime Grid */}
+          {media.length !== 0 ? (
+            <div className="space-y-12 pb-12">
+              {filterMedia(listFilter).map((item, index) => (
+                <div key={index} className="space-y-6">
+                  <div className="flex items-center gap-3">
+                    <h2 className="text-2xl font-bold text-white font-outfit">
+                      {item.name}
+                    </h2>
+                    <Badge variant="secondary" className="text-base">
+                      {item.entries.length}
+                    </Badge>
+                  </div>
+
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 lg:gap-6">
+                    {item.entries.map((entry) => (
+                      <div key={entry.mediaId} className="relative group">
+                        <Link href={`/en/anime/${entry.media.id}`}>
+                          <div className="relative aspect-[2/3] rounded-xl overflow-hidden bg-secondary-light border border-white/5 group-hover:border-brand-500/50 transition-all duration-300 shadow-lg group-hover:shadow-2xl group-hover:shadow-brand-500/30 group-hover:z-10 group-hover:-translate-y-2">
+                            <Image
+                              src={entry.media.coverImage.large}
+                              alt={entry.media.title.romaji}
+                              fill
+                              className="object-cover transition-transform duration-300 group-hover:scale-110"
+                              sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 16vw"
+                            />
+
+                            {/* Status Indicator */}
+                            {entry.media.status === "RELEASING" && (
+                              <div className="absolute top-2 left-2 px-2 py-1 bg-green-500 rounded-md text-xs font-semibold z-10">
+                                Airing
+                              </div>
+                            )}
+
+                            {/* Progress Badge */}
+                            <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/80 backdrop-blur-sm rounded-md z-10">
+                              <span className="text-xs font-semibold text-white">
+                                {entry.progress === entry.media.episodes
+                                  ? entry.progress
+                                  : entry.media.episodes === null
+                                    ? entry.progress
+                                    : `${entry.progress}/${entry.media.episodes}`}
+                              </span>
+                            </div>
+
+                            {/* Score Badge */}
+                            {entry.score > 0 && (
+                              <div className="absolute top-2 right-2 px-2 py-1 bg-black/80 backdrop-blur-sm rounded-md flex items-center gap-1 z-10">
+                                <StarIcon className="w-3 h-3 text-yellow-400 fill-yellow-400" />
+                                <span className="text-xs font-semibold text-white">
+                                  {entry.score}
+                                </span>
+                              </div>
+                            )}
+
+                            {/* Gradient Overlay - always visible but intensifies on hover */}
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-60 group-hover:opacity-100 transition-opacity duration-300" />
+
+                            {/* Title overlay on card - visible on hover */}
+                            <div className="absolute bottom-0 left-0 right-0 p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300 bg-gradient-to-t from-black via-black/95 to-transparent">
+                              <p className="text-sm font-semibold text-white line-clamp-2 mb-1">
+                                {entry.media.title.romaji}
+                              </p>
+                              {entry.media.format && (
+                                <p className="text-xs text-white/70">
+                                  {entry.media.format.replace(/_/g, " ")}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        </Link>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <Card className="bg-secondary-light/50 border-white/5">
+              <CardContent className="py-16 text-center">
+                <p className="text-lg text-white/70 mb-4">
+                  {user.name === sessions?.user.name
+                    ? "You haven't watched anything yet"
+                    : "This user hasn't watched anything yet"}
+                </p>
+                <Link href="/en/search/anime">
+                  <Button variant="primary">Start Watching</Button>
+                </Link>
+              </CardContent>
+            </Card>
           )}
         </div>
       </div>
@@ -399,37 +346,29 @@ export async function getServerSideProps(context: any) {
                   anime {
                       count
                       episodesWatched
-                      meanScore
                       minutesWatched
                   }
-              }
-                bannerImage
-                mediaListOptions {
-                  animeList {
-                      sectionOrder
-                  }
                 }
+                bannerImage
               }
               lists {
-                status
                 name
+                status
                 entries {
-                  id
                   mediaId
-                  status
-                  progress
                   score
+                  progress
                   media {
                     id
                     status
                     title {
-                      english
                       romaji
+                      english
+                    }
+                    coverImage {
+                        large
                     }
                     episodes
-                    coverImage {
-                      large
-                    }
                   }
                 }
               }
@@ -444,66 +383,51 @@ export async function getServerSideProps(context: any) {
     context
   );
 
-  const get = data?.data?.MediaListCollection;
-  const sectionOrder = get?.user.mediaListOptions.animeList.sectionOrder;
+  const user = data?.data?.MediaListCollection?.user;
+  const lists = data?.data?.MediaListCollection?.lists || [];
 
-  if (!sectionOrder) {
+  if (!user) {
     return {
       notFound: true,
     };
   }
 
-  let userData;
+  const time = getTime(user?.statistics?.anime?.minutesWatched);
+  const userSettings = await getUser(query.user);
 
-  if (session) {
-    userData = await getUser(session.user.name, false);
-  }
-
-  const prog = get.lists;
-
-  function getIndex(status: string) {
-    const index = sectionOrder.indexOf(status);
-    return index === -1 ? sectionOrder.length : index;
-  }
-
-  prog.sort(
-    (a: { name: string }, b: { name: string }) =>
-      getIndex(a.name) - getIndex(b.name)
-  );
-
-  const user = get.user;
-
-  const time = convertMinutesToDays(user.statistics.anime.minutesWatched);
+  // Serialize Date objects to avoid Next.js serialization errors
+  const serializedUserSettings = userSettings ? {
+    ...userSettings,
+    WatchListEpisode: userSettings.WatchListEpisode?.map((episode: any) => ({
+      ...episode,
+      createdDate: episode.createdDate ? episode.createdDate.toISOString() : null,
+    })) || [],
+  } : null;
 
   return {
     props: {
-      media: prog,
-      sessions: session,
+      media: lists,
+      sessions: session || null,
       user: user,
-      time: time,
-      userSettings: userData?.setting || null,
+      time: time || { days: 0, hours: 0 },
+      userSettings: serializedUserSettings,
     },
   };
 }
 
-function UnixTimeConverter({ unixTime }: { unixTime: number }) {
-  const date = new Date(unixTime * 1000); // multiply by 1000 to convert to milliseconds
-  const formattedDate = date.toISOString().slice(0, 10); // format date to YYYY-MM-DD
+const UnixTimeConverter = ({ unixTime }: { unixTime: number }) => {
+  if (!unixTime) return null;
+  const dateObject = new Date(unixTime * 1000);
+  const humanDateFormat = dateObject.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+  return <>{humanDateFormat}</>;
+};
 
-  return <p>{formattedDate}</p>;
-}
-
-function convertMinutesToDays(minutes: number) {
-  const hours = minutes / 60;
-  const days = hours / 24;
-
-  if (days >= 1) {
-    return days % 1 === 0
-      ? { days: `${days}` }
-      : { days: `${days.toFixed(1)}` };
-  } else {
-    return hours % 1 === 0
-      ? { hours: `${hours}` }
-      : { hours: `${hours.toFixed(1)}` };
-  }
-}
+const getTime = (minutes: number) => {
+  const days = Math.floor(minutes / 1440);
+  const hours = Math.floor(minutes / 60);
+  return { days, hours };
+};

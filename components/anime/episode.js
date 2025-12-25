@@ -4,15 +4,15 @@ import ViewSelector from "./viewSelector";
 import ThumbnailOnly from "./viewMode/thumbnailOnly";
 import ThumbnailDetail from "./viewMode/thumbnailDetail";
 import ListMode from "./viewMode/listMode";
+import ModernGrid from "./viewMode/modernGrid";
 import { toast } from "sonner";
 
 const ITEMS_PER_PAGE = 13;
-const DEFAULT_VIEW = 3;
+const DEFAULT_VIEW = 4; // New modern grid view
 
 const fetchEpisodes = async (info, isDub, refresh = false) => {
   const response = await fetch(
-    `/api/v2/episode/${info.id}?releasing=${
-      info.status === "RELEASING" ? "true" : "false"
+    `/api/v2/episode/${info.id}?releasing=${info.status === "RELEASING" ? "true" : "false"
     }${isDub ? "&dub=true" : ""}${refresh ? "&refresh=true" : ""}`
   ).then((res) => res.json());
 
@@ -39,7 +39,10 @@ const filterProviders = (response) => {
 
 const setDefaultProvider = (providers, setProviderId) => {
   if (providers.length > 0) {
+    // Prioritize HiAnime, then gogoanime, then 9anime
     const defaultProvider = providers.find(
+      (x) => x.providerId === "hianime"
+    ) || providers.find(
       (x) => x.providerId === "gogoanime" || x.providerId === "9anime"
     );
     setProviderId(defaultProvider?.providerId || providers[0].providerId);
@@ -123,11 +126,9 @@ export default function AnimeEpisode({
         ? episodes.find((i) => i.number === progress + 1)
         : episodes[0];
       if (getEpi) {
-        const watchUrl = `/en/anime/watch/${
-          info.id
-        }/${providerId}?id=${encodeURIComponent(getEpi.id)}&num=${
-          getEpi.number
-        }${isDub ? `&dub=${isDub}` : ""}`;
+        const watchUrl = `/en/anime/watch/${info.id
+          }/${providerId}?id=${encodeURIComponent(getEpi.id)}&num=${getEpi.number
+          }${isDub ? `&dub=${isDub}` : ""}`;
         setWatch(watchUrl);
       } else {
         setWatch(null);
@@ -199,7 +200,7 @@ export default function AnimeEpisode({
           <div className="flex justify-between">
             <div className="flex items-center gap-4 md:gap-5">
               {info && (
-                <h1 className="text-[20px] lg:text-2xl font-bold font-karla">
+                <h1 className="text-[20px] lg:text-2xl font-bold font-inter">
                   Episodes
                 </h1>
               )}
@@ -213,7 +214,7 @@ export default function AnimeEpisode({
                   }}
                   className="relative flex flex-col items-center w-5 h-5 group"
                 >
-                  <span className="absolute pointer-events-none z-40 opacity-0 -translate-y-8 group-hover:-translate-y-10 group-hover:opacity-100 font-karla shadow-tersier shadow-md whitespace-nowrap bg-secondary px-2 py-1 rounded transition-all duration-200 ease-out">
+                  <span className="absolute pointer-events-none z-40 opacity-0 -translate-y-8 group-hover:-translate-y-10 group-hover:opacity-100 font-inter shadow-tersier shadow-md whitespace-nowrap bg-secondary px-2 py-1 rounded transition-all duration-200 ease-out">
                     Refresh Episodes
                   </span>
                   <svg
@@ -235,11 +236,11 @@ export default function AnimeEpisode({
             <div className="flex items-center gap-2">
               <div
                 onClick={() => setIsDub((prev) => !prev)}
-                className="flex lg:hidden flex-col items-center relative rounded-md bg-secondary py-1.5 px-3 font-karla text-sm hover:ring-1 ring-action cursor-pointer group"
+                className="flex lg:hidden flex-col items-center relative rounded-md bg-secondary py-1.5 px-3 font-inter text-sm hover:ring-1 ring-brand-500 cursor-pointer group"
               >
                 {isDub ? "Dub" : "Sub"}
 
-                <span className="absolute pointer-events-none z-40 opacity-0 -translate-y-8 group-hover:-translate-y-10 group-hover:opacity-100 font-karla shadow-tersier shadow-md whitespace-nowrap bg-secondary px-2 py-1 rounded transition-all duration-200 ease-out">
+                <span className="absolute pointer-events-none z-40 opacity-0 -translate-y-8 group-hover:-translate-y-10 group-hover:opacity-100 font-inter shadow-tersier shadow-md whitespace-nowrap bg-secondary px-2 py-1 rounded transition-all duration-200 ease-out">
                   Switch to {isDub ? "Sub" : "Dub"}
                 </span>
               </div>
@@ -265,9 +266,8 @@ export default function AnimeEpisode({
             </div>
           </div>
           <div
-            className={`flex lg:flex gap-3 items-center justify-between ${
-              visible ? "" : "hidden"
-            }`}
+            className={`flex lg:flex gap-3 items-center justify-between ${visible ? "" : "hidden"
+              }`}
           >
             {providers && (
               <div
@@ -309,7 +309,7 @@ export default function AnimeEpisode({
                         onChange={(e) =>
                           handlePageChange(Number(e.target.value))
                         }
-                        className="flex items-center text-sm gap-5 rounded-[3px] bg-secondary py-1 px-3 pr-8 font-karla appearance-none cursor-pointer outline-none focus:ring-1 focus:ring-action hover:ring-1 hover:ring-action"
+                        className="flex items-center text-sm gap-5 rounded-lg bg-secondary-light/50 border border-white/5 py-1.5 px-3 pr-8 font-inter appearance-none cursor-pointer outline-none focus:ring-2 focus:ring-brand-500 hover:border-brand-500/50 transition-all"
                       >
                         {[...Array(totalPages)].map((_, i) => (
                           <option key={i} value={i + 1}>
@@ -328,7 +328,7 @@ export default function AnimeEpisode({
               view={view}
               setView={setView}
               episode={currentEpisodes}
-              // map={mapProviders}
+            // map={mapProviders}
             />
           </div>
         </div>
@@ -336,21 +336,18 @@ export default function AnimeEpisode({
         {/* Episodes */}
         {!loading ? (
           <div
-            className={`${
-              view === 1
+            className={`${view === 1
                 ? "grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-5 lg:gap-8 place-items-center"
                 : view === 2
-                ? "flex flex-col gap-3"
-                : `flex flex-col odd:bg-secondary even:bg-primary`
-            } py-2`}
+                  ? "flex flex-col gap-3"
+                  : view === 4
+                    ? "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4"
+                    : `flex flex-col odd:bg-secondary even:bg-primary`
+              } py-2`}
           >
             {Array.isArray(providers) ? (
               providers.length > 0 ? (
                 currentEpisodes.map((episode, index) => {
-                  // const mapData = mapProviders?.find(
-                  //   (i) => i.number === episode.number
-                  // );
-
                   return (
                     <Fragment key={index}>
                       {view === 1 && (
@@ -358,7 +355,6 @@ export default function AnimeEpisode({
                           key={index}
                           index={index}
                           info={info}
-                          // image={mapData?.img || mapData?.image}
                           providerId={providerId}
                           episode={episode}
                           artStorage={artStorage}
@@ -369,9 +365,6 @@ export default function AnimeEpisode({
                       {view === 2 && (
                         <ThumbnailDetail
                           key={index}
-                          // image={mapData?.img || mapData?.image}
-                          // title={mapData?.title}
-                          // description={mapData?.description}
                           index={index}
                           epi={episode}
                           provider={providerId}
@@ -392,12 +385,23 @@ export default function AnimeEpisode({
                           dub={isDub}
                         />
                       )}
+                      {view === 4 && (
+                        <ModernGrid
+                          key={index}
+                          info={info}
+                          providerId={providerId}
+                          episode={episode}
+                          artStorage={artStorage}
+                          progress={progress}
+                          dub={isDub}
+                        />
+                      )}
                     </Fragment>
                   );
                 })
               ) : (
                 <div className="h-[20vh] lg:w-full flex-center flex-col gap-5">
-                  <p className="text-center font-karla font-bold lg:text-lg">
+                  <p className="text-center font-inter font-bold lg:text-lg">
                     Oops!<br></br> It looks like this anime is not available.
                   </p>
                 </div>

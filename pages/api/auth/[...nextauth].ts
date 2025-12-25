@@ -1,7 +1,8 @@
 import NextAuth, { NextAuthOptions } from "next-auth";
+import { getEnv } from "../../../lib/env";
 
 export const authOptions: NextAuthOptions = {
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: getEnv("NEXTAUTH_SECRET"),
   providers: [
     {
       id: "AniListProvider",
@@ -93,8 +94,8 @@ export const authOptions: NextAuthOptions = {
           };
         },
       },
-      clientId: process.env.CLIENT_ID,
-      clientSecret: process.env.CLIENT_SECRET,
+      clientId: getEnv("CLIENT_ID"),
+      clientSecret: getEnv("CLIENT_SECRET"),
       profile(profile) {
         return {
           token: profile.token,

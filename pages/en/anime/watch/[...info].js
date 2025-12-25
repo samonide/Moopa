@@ -40,7 +40,17 @@ export async function getServerSideProps(context) {
   }
   const disqus = process.env.DISQUS_SHORTNAME || null;
 
-  const [aniId, provider] = query?.info;
+  const [aniId, providerParam] = query?.info;
+
+  // Map source1, source2, etc. to actual provider names
+  const providerMap = {
+    'source1': 'hianime',
+    'source2': 'anicrush',
+    'source3': 'consumet',
+  };
+
+  const provider = providerMap[providerParam] || providerParam || 'hianime';
+
   const watchId = query?.id;
   const epiNumber = query?.num;
   const dub = query?.dub;
@@ -133,6 +143,7 @@ export async function getServerSideProps(context) {
     props: {
       sessions: session,
       provider: provider || null,
+      providerParam: providerParam || 'source1', // Pass the URL-friendly name
       watchId: watchId || null,
       epiNumber: epiNumber || null,
       dub: dub || null,
@@ -153,8 +164,23 @@ export default function Watch({
   userData,
   sessions,
   provider,
+  providerParam,
   epiNumber
 }) {
+  const router = useRouter();
+
+  // Show loading if info is not available
+  if (!info) {
+    return (
+      <div className="w-screen h-screen flex items-center justify-center bg-primary">
+        <div className="flex flex-col items-center gap-4">
+          <Spinner />
+          <p className="text-white font-karla">Loading anime information...</p>
+        </div>
+      </div>
+    );
+  }
+
   const [artStorage, setArtStorage] = useState(null);
 
   const [episodeNavigation, setEpisodeNavigation] = useState(null);
@@ -169,8 +195,6 @@ export default function Watch({
 
   const [onList, setOnList] = useState(false);
 
-  const router = useRouter();
-
   const {
     theaterMode,
     setPlayerState,
@@ -183,6 +207,8 @@ export default function Watch({
 
   useEffect(() => {
     async function getInfo() {
+      if (!info) return;
+
       if (info.mediaListEntry) {
         setOnList(true);
       }
@@ -190,15 +216,14 @@ export default function Watch({
       setDataMedia(info);
 
       const response = await fetch(
-        `/api/v2/episode/${info.id}?releasing=${
-          info.status === "RELEASING" ? "true" : "false"
+        `/api/v2/episode/${info.id}?releasing=${info.status === "RELEASING" ? "true" : "false"
         }${dub ? "&dub=true" : ""}`
       ).then((res) => res.json());
       const getMap = response.find((i) => i?.map === true) || response[0];
       let episodes = response;
 
       if (getMap) {
-        if (provider === "gogoanime" && !watchId.startsWith("/")) {
+        if (provider === "gogoanime" && watchId && !watchId.startsWith("/")) {
           episodes = episodes.filter((i) => {
             if (i?.providerId === "gogoanime" && i?.map !== true) {
               return null;
@@ -212,6 +237,17 @@ export default function Watch({
 
       if (episodes) {
         const getProvider = episodes?.find((i) => i.providerId === provider);
+
+        // Debug logging
+        console.log("Looking for provider:", provider);
+        console.log("Available providers:", episodes.map(e => e.providerId));
+        console.log("Found provider:", getProvider?.providerId);
+
+        if (!getProvider) {
+          console.error(`Provider ${provider} not found in episodes response`);
+          return;
+        }
+
         const episodeList = getProvider?.episodes.slice(
           0,
           getMap?.episodes.length
@@ -225,6 +261,13 @@ export default function Watch({
           const currentEpisode = episodeList?.find(
             (i) => i.number === parseInt(epiNumber)
           );
+
+          // If watchId is not provided, redirect with the correct episode ID
+          if (!watchId && currentEpisode) {
+            router.replace(`/en/anime/watch/${info.id}/${providerParam}?id=${currentEpisode.id}&num=${epiNumber}${dub ? `&dub=${dub}` : ""}`);
+            return;
+          }
+
           const nextEpisode = episodeList?.find(
             (i) => i.number === parseInt(epiNumber) + 1
           );
@@ -268,26 +311,42 @@ export default function Watch({
     }
 
     async function fetchData() {
+      // Only fetch source if we have a valid watchId (episode ID)
+      if (!watchId) {
+        console.log("No watchId provided, waiting for episode to be selected/redirected");
+        return;
+      }
+
       if (info) {
+        const sourceToUse = provider === "hianime" ? "hianime"
+          : provider === "gogoanime" ? "consumet"
+            : "anify";
+
+        const requestBody = {
+          source: sourceToUse,
+          providerId: provider,
+          watchId: watchId,
+          episode: epiNumber,
+          id: info.id,
+          sub: dub ? "dub" : "sub",
+          server: "HD-1" // Default HiAnime server
+        };
+
+        console.log("Fetching source with:", requestBody);
+
         const anify = await fetch("/api/v2/source", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
           },
-          body: JSON.stringify({
-            source:
-              provider === "gogoanime" && !watchId.startsWith("/")
-                ? "consumet"
-                : "anify",
-            providerId: provider,
-            watchId: watchId,
-            episode: epiNumber,
-            id: info.id,
-            sub: dub ? "dub" : "sub"
-          })
+          body: JSON.stringify(requestBody)
         }).then((res) => res.json());
 
-        if (!anify?.sources?.length > 0) {
+        console.log("Source API response:", anify);
+
+        if (!anify?.sources || !Array.isArray(anify.sources) || anify.sources.length === 0) {
+          console.error("No sources found in response:", anify);
+          console.error("Expected sources array but got:", typeof anify?.sources, anify?.sources);
           router.push(`/en/anime/${info.id}?notfound=true`);
           return;
         }
@@ -308,18 +367,18 @@ export default function Watch({
         });
 
         let getOp =
-            skip?.results?.find((item) => item.skipType === "op") || null,
+          skip?.results?.find((item) => item.skipType === "op") || null,
           getEd = skip?.results?.find((item) => item.skipType === "ed") || null;
 
         const op = getOp
-            ? {
-                startTime:
-                  anify?.intro?.start ?? Math.round(getOp?.interval.startTime),
-                endTime:
-                  anify?.intro?.end ?? Math.round(getOp?.interval.endTime),
-                text: "Opening"
-              }
-            : null,
+          ? {
+            startTime:
+              anify?.intro?.start ?? Math.round(getOp?.interval.startTime),
+            endTime:
+              anify?.intro?.end ?? Math.round(getOp?.interval.endTime),
+            text: "Opening"
+          }
+          : null,
           ed = {
             startTime:
               anify?.outro?.start ?? Math.round(getEd?.interval.startTime),
@@ -333,14 +392,22 @@ export default function Watch({
             (i) => i.quality === "default" || i.quality === "auto"
           ) || anify?.sources[0];
 
-        const reFormSubtitles = anify?.subtitles?.map((i) => {
+        console.log("Selected quality:", quality);
+
+        // Proxy video URL to bypass CORS
+        const videoUrl = quality?.url ?
+          `/api/proxy/stream?url=${encodeURIComponent(quality.url)}${anify?.headers?.Referer ? `&referer=${encodeURIComponent(anify.headers.Referer)}` : ''
+          }${anify?.headers?.Origin ? `&origin=${encodeURIComponent(anify.headers.Origin)}` : ''
+          }` : null;
+
+        const reFormSubtitles = anify?.subtitles?.filter((i) => i?.url).map((i) => {
           return {
-            src: proxy + "/" + i.url,
-            label: i.lang,
+            src: proxy ? proxy + "/" + i.url : i.url,
+            label: i.lang || "Unknown",
             kind: i.lang === "Thumbnails" ? "thumbnails" : "subtitles",
             ...(i.lang === "English" && { default: true })
           };
-        });
+        }) || [];
 
         const thumbnails = reFormSubtitles?.find(
           (i) => i.kind === "thumbnails"
@@ -354,7 +421,7 @@ export default function Watch({
           provider,
           isDub: dub,
           defaultQuality: {
-            url: quality?.url,
+            url: videoUrl,
             headers: anify?.headers
           },
           subtitles: subtitles,
@@ -363,6 +430,7 @@ export default function Watch({
           skip: skipData
         };
 
+        console.log("Track episode data:", episode);
         setTrack(episode);
       }
     }
@@ -394,11 +462,10 @@ export default function Watch({
 
     mediaSession.metadata = new MediaMetadata({
       title: title,
-      artist: `Moopa ${
-        title === info?.title?.romaji
-          ? "- Episode " + epiNumber
-          : `- ${info?.title?.romaji || info?.title?.english}`
-      }`,
+      artist: `Moopa ${title === info?.title?.romaji
+        ? "- Episode " + epiNumber
+        : `- ${info?.title?.romaji || info?.title?.english}`
+        }`,
       artwork
     });
   }, [episodeNavigation, info, epiNumber]);
@@ -458,9 +525,8 @@ export default function Watch({
         <meta property="og:type" content="website" />
         <meta
           property="og:title"
-          content={`Watch - ${
-            episodeNavigation?.playing?.title || info?.title?.english
-          }`}
+          content={`Watch - ${episodeNavigation?.playing?.title || info?.title?.english
+            }`}
         />
         <meta
           property="og:description"
@@ -478,9 +544,8 @@ export default function Watch({
         />
         <meta
           name="twitter:title"
-          content={`Watch - ${
-            episodeNavigation?.playing?.title || info?.title?.english
-          }`}
+          content={`Watch - ${episodeNavigation?.playing?.title || info?.title?.english
+            }`}
         />
         <meta
           name="twitter:description"
@@ -525,6 +590,38 @@ export default function Watch({
         <div
           className={`mx-auto pt-16 ${theaterMode ? "lg:pt-16" : "lg:pt-20"}`}
         >
+          {/* Source Selector - Always visible */}
+          <div className={`${theaterMode ? "lg:max-w-[95%] xl:max-w-[80%]" : "lg:max-w-[95%]"} w-full mx-auto px-3 lg:px-0 pb-3`}>
+            <div className="flex items-center gap-3">
+              <span className="text-sm font-karla text-white/70">Source:</span>
+              <div className="flex gap-2">
+                {[
+                  { name: "Source 1", value: "source1", available: true },
+                  { name: "Source 2", value: "source2", available: false },
+                  { name: "Source 3", value: "source3", available: false }
+                ].map((source, index) => (
+                  <button
+                    key={source.value}
+                    disabled={!source.available}
+                    onClick={() => {
+                      if (source.available && watchId) {
+                        router.push(`/en/anime/watch/${info.id}/${source.value}?id=${watchId}&num=${epiNumber}${dub ? `&dub=${dub}` : ""}`);
+                      }
+                    }}
+                    className={`px-4 py-2 rounded-lg font-karla font-semibold text-sm transition-all duration-200 ${providerParam === source.value
+                      ? "bg-action text-white shadow-lg"
+                      : source.available
+                        ? "bg-secondary hover:bg-secondary/80 text-white"
+                        : "bg-secondary/50 text-white/30 cursor-not-allowed"
+                      }`}
+                  >
+                    {source.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
           {theaterMode && (
             <div
               className={`bg-black w-full max-h-[84dvh] h-full flex-center rounded-md`}
@@ -546,17 +643,15 @@ export default function Watch({
           )}
           <div
             id="default"
-            className={`${
-              theaterMode ? "lg:max-w-[95%] xl:max-w-[80%]" : "lg:max-w-[95%]"
-            } w-full flex flex-col lg:flex-row mx-auto`}
+            className={`${theaterMode ? "lg:max-w-[95%] xl:max-w-[80%]" : "lg:max-w-[95%]"
+              } w-full flex flex-col lg:flex-row mx-auto`}
           >
             <div id="primary" className="w-full">
               {!theaterMode && (
                 <div
-                  className={`bg-black w-full flex-center rounded-md overflow-hidden ${
-                    aspectRatio === "4/3" ? "aspect-video" : ""
-                  }`}
-                  // style={{ aspectRatio: aspectRatio }}
+                  className={`bg-black w-full flex-center rounded-md overflow-hidden ${aspectRatio === "4/3" ? "aspect-video" : ""
+                    }`}
+                // style={{ aspectRatio: aspectRatio }}
                 >
                   {episodeNavigation ? (
                     <VidStack
@@ -584,7 +679,7 @@ export default function Watch({
                         className="hover:underline line-clamp-1"
                       >
                         {(episodeNavigation?.playing?.title ||
-                          info.title.romaji) ??
+                          info?.title?.romaji) ??
                           "Loading..."}
                       </Link>
                     </div>
@@ -639,7 +734,7 @@ export default function Watch({
                 info={info}
                 session={sessions}
                 map={mapEpisode}
-                providerId={provider}
+                providerId={providerParam}
                 watchId={watchId}
                 episode={episodesList}
                 artStorage={artStorage}

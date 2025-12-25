@@ -135,12 +135,11 @@ export default function Info({ info, color, chapterNotFound }: InfoTypes) {
         />
         <meta
           name="twitter:image"
-          content={`${domainUrl}/api/og?title=${
-            info.title.romaji || info.title.english
-          }&image=${info.bannerImage || info.coverImage.extraLarge}`}
+          content={`${domainUrl}/api/og?title=${info.title.romaji || info.title.english
+            }&image=${info.bannerImage || info.coverImage.extraLarge}`}
         />
       </Head>
-      <Navbar info={info} />
+      <Navbar info={info} back />
       <Modal open={open} onClose={() => handleClose()}>
         <div>
           {!session && (
@@ -175,8 +174,8 @@ export default function Info({ info, color, chapterNotFound }: InfoTypes) {
         </div>
       </Modal>
       <MobileNav hideProfile={true} />
-      <main className="w-screen min-h-screen relative flex flex-col items-center bg-primary gap-5">
-        <div className="w-screen absolute">
+      <main className="w-screen min-h-screen relative flex flex-col items-center bg-primary gap-5 pt-16 lg:pt-20">
+        <div className="w-screen absolute top-16 lg:top-20">
           <div className="bg-gradient-to-t from-primary from-10% to-transparent absolute h-[280px] w-screen z-10 inset-0" />
           {info?.bannerImage && (
             <Image
@@ -199,13 +198,7 @@ export default function Info({ info, color, chapterNotFound }: InfoTypes) {
             color={color}
           />
 
-          <AnimeEpisode
-            info={info}
-            session={session}
-            progress={progress}
-            setProgress={setProgress}
-            setWatch={setWatch}
-          />
+          {/* Episode section removed - now directly access from watch page */}
 
           {info?.characters?.edges && (
             <div className="w-full">
