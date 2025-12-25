@@ -193,7 +193,7 @@ export default function MangaReader({
 
                 {/* Settings Panel */}
                 {showSettings && (
-                    <div 
+                    <div
                         className="fixed top-16 right-4 z-50 bg-secondary rounded-lg p-4 shadow-xl w-72"
                         onClick={(e) => e.stopPropagation()}
                     >

@@ -21,7 +21,7 @@ const ChapterSelector = ({ chaptersData, data, setWatch, mangaId }) => {
       (c) => c.providerId === selectedProvider
     );
     const chaptersList = selectedChapters?.chapters || [];
-    
+
     // Sort chapters based on sortOrder
     const sortedChapters = [...chaptersList].sort((a, b) => {
       if (sortOrder === "asc") {
@@ -30,7 +30,7 @@ const ChapterSelector = ({ chaptersData, data, setWatch, mangaId }) => {
         return b.number - a.number; // Latest first
       }
     });
-    
+
     setChapters(sortedChapters);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
