@@ -12,6 +12,8 @@ export function getHeaders(providerId: string) {
       return { Referer: "https://mangasee123.com" };
     case "comick":
       return { Referer: "https://comick.app" };
+    case "comix":
+      return { Referer: "https://comix.to" };
     default:
       return null;
   }
@@ -47,9 +49,9 @@ export function parseImageProxy(
 
   return providerId
     ? `https://aoi.moopa.live/utils/image-proxy?url=${truncateImgUrl(
-        url
-      )}${`&headers=${encodeURIComponent(
-        JSON.stringify({ Referer: providerId })
-      )}`}`
+      url
+    )}${`&headers=${encodeURIComponent(
+      JSON.stringify({ Referer: providerId })
+    )}`}`
     : url;
 }

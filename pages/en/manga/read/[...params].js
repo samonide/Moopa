@@ -66,7 +66,13 @@ export default function Read({
 
   useEffect(() => {
     hasRun.current = false;
-    const chapters = chaptersData.find((x) => x.providerId === provider);
+    const chapters = chaptersData?.find((x) => x.providerId === provider);
+
+    if (!chapters) {
+      console.error('No chapters found for provider:', provider);
+      return;
+    }
+
     const currentChapter = chapters.chapters?.find((x) => x.id === currentId);
 
     setCurrentChapter(currentChapter);
@@ -92,10 +98,8 @@ export default function Read({
       event.preventDefault();
       if (event.key === "ArrowRight" && event.ctrlKey && nextChapter?.id) {
         router.push(
-          `/en/manga/read/${
-            chapter.providerId
-          }?id=${mangaDexId}&chapterId=${encodeURIComponent(nextChapter?.id)}${
-            info?.id?.length > 6 ? "" : `&anilist=${info?.id}`
+          `/en/manga/read/${chapter.providerId
+          }?id=${mangaDexId}&chapterId=${encodeURIComponent(nextChapter?.id)}${info?.id?.length > 6 ? "" : `&anilist=${info?.id}`
           }&num=${nextChapter?.number}`
         );
       } else if (
@@ -104,10 +108,8 @@ export default function Read({
         prevChapter?.id
       ) {
         router.push(
-          `/en/manga/read/${
-            chapter.providerId
-          }?id=${mangaDexId}&chapterId=${encodeURIComponent(prevChapter?.id)}${
-            info?.id?.length > 6 ? "" : `&anilist=${info?.id}`
+          `/en/manga/read/${chapter.providerId
+          }?id=${mangaDexId}&chapterId=${encodeURIComponent(prevChapter?.id)}${info?.id?.length > 6 ? "" : `&anilist=${info?.id}`
           }&num=${prevChapter?.number}`
         );
       }
@@ -138,9 +140,8 @@ export default function Read({
       <Head>
         <title>
           {info
-            ? `Manga - ${
-                info.title.romaji || info.title.english || info.title.native
-              }`
+            ? `Manga - ${info.title.romaji || info.title.english || info.title.native
+            }`
             : "Getting Info..."}
         </title>
         <meta
@@ -287,7 +288,7 @@ async function fetchAnifyPages(id, number, provider, readId, key) {
       readId
     )}`;
 
-    const { data } = await axios.get(url);
+    const { data } = await axios.get(url, { timeout: 8000 });
 
     if (!data) {
       return null;
@@ -303,7 +304,43 @@ async function fetchAnifyPages(id, number, provider, readId, key) {
 
     return data;
   } catch (error) {
+    console.error('Anify pages error:', error.message);
     return { error: "Error fetching data" };
+  }
+}
+
+async function fetchComixPages(chapterId) {
+  try {
+    let cached;
+
+    if (redis) cached = await redis.get(`comix:pages:${chapterId}`);
+
+    if (cached) {
+      return JSON.parse(cached);
+    }
+
+    const url = `http://localhost:3000/api/v2/manga/pages?chapterId=${encodeURIComponent(
+      chapterId
+    )}&provider=comix`;
+
+    const { data } = await axios.get(url);
+
+    if (!data || data.length === 0) {
+      return null;
+    }
+
+    if (redis)
+      await redis.set(
+        `comix:pages:${chapterId}`,
+        JSON.stringify(data),
+        "EX",
+        60 * 60 * 24 * 7
+      );
+
+    return data;
+  } catch (error) {
+    console.error('Comix pages error:', error.message);
+    return { error: "Error fetching pages from Comix" };
   }
 }
 
@@ -323,14 +360,22 @@ export async function getServerSideProps(context) {
   // const data = await getConsumetPages(mediaId, providerId, chapterId, key);
   // const chapters = await getConsumetChapters(mediaId, redis);
 
-  const dataManga = await fetchAnifyPages(
-    mediaId,
-    number,
-    providerId,
-    chapterId,
-    mediaId,
-    key
-  );
+  let dataManga;
+
+  // Use Comix provider if specified
+  if (providerId === 'comix') {
+    dataManga = await fetchComixPages(chapterId);
+  } else {
+    // Fall back to Anify
+    dataManga = await fetchAnifyPages(
+      mediaId,
+      number,
+      providerId,
+      chapterId,
+      mediaId,
+      key
+    );
+  }
 
   let info;
 
@@ -358,9 +403,39 @@ export async function getServerSideProps(context) {
     }
   }
 
-  const chapters = await (
-    await fetch("https://api.anify.tv/chapters/" + mediaId)
-  ).json();
+  let chapters = [];
+
+  // Fetch chapters based on provider
+  if (providerId === 'comix') {
+    // Extract mangaId from mediaId (format: hashId|slug)
+    const comixMangaId = mediaId.split('|').slice(0, 2).join('|');
+    try {
+      const chaptersResponse = await fetch(
+        `http://localhost:3000/api/v2/manga/chapters?mangaId=${encodeURIComponent(comixMangaId)}&provider=comix`
+      );
+      if (chaptersResponse.ok) {
+        const comixChapters = await chaptersResponse.json();
+        chapters = [{
+          providerId: 'comix',
+          chapters: comixChapters || []
+        }];
+      }
+    } catch (error) {
+      console.error('Error fetching Comix chapters:', error);
+      chapters = [];
+    }
+  } else {
+    // Fetch from Anify
+    try {
+      const anifyChapters = await (
+        await fetch("https://api.anify.tv/chapters/" + mediaId, { timeout: 8000 })
+      ).json();
+      chapters = anifyChapters || [];
+    } catch (error) {
+      console.error('Error fetching Anify chapters:', error);
+      chapters = [];
+    }
+  }
 
   if ((dataManga && dataManga?.error) || dataManga?.length === 0) {
     return {

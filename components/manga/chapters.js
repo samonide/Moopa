@@ -79,9 +79,9 @@ const ChapterSelector = ({ chaptersData, data, setWatch, mangaId }) => {
         ? chapters[data?.mediaListEntry?.progress]
         : chapters[0];
       if (getEpi) {
-        const watchUrl = `/en/manga/read/${selectedProvider}?id=${mangaId}&chapterId=${encodeURIComponent(
+        const watchUrl = `/en/manga/read-new/${selectedProvider}/${encodeURIComponent(
           getEpi.id
-        )}&anilist=${data.id}&num=${getEpi.number}`;
+        )}?mangaId=${encodeURIComponent(mangaId)}&anilistId=${data.id}`;
         setWatch(watchUrl);
       } else {
         setWatch(null);
@@ -98,20 +98,24 @@ const ChapterSelector = ({ chaptersData, data, setWatch, mangaId }) => {
           Chapters
         </h1>
         <div className="relative flex gap-2 items-center group">
-          <select
-            id="provider"
-            className="flex items-center text-sm gap-5 rounded-[3px] bg-secondary py-1 px-3 pr-8 font-karla appearance-none cursor-pointer outline-none focus: focus:ring-action group-hover: group-hover:ring-action"
-            value={selectedProvider}
-            onChange={(e) => setSelectedProvider(e.target.value)}
-          >
-            {/* <option value="">--Select a provider--</option> */}
-            {chaptersData.map((provider, index) => (
-              <option key={provider.providerId} value={provider.providerId}>
-                {provider.providerId}
-              </option>
-            ))}
-          </select>
-          <ChevronDownIcon className="absolute right-2 top-1/2 transform -translate-y-1/2 w-5 h-5 pointer-events-none" />
+          {chaptersData.length > 1 && (
+            <>
+              <select
+                id="provider"
+                className="flex items-center text-sm gap-5 rounded-[3px] bg-secondary py-1 px-3 pr-8 font-karla appearance-none cursor-pointer outline-none focus: focus:ring-action group-hover: group-hover:ring-action"
+                value={selectedProvider}
+                onChange={(e) => setSelectedProvider(e.target.value)}
+              >
+                {/* <option value="">--Select a provider--</option> */}
+                {chaptersData.map((provider, index) => (
+                  <option key={provider.providerId} value={provider.providerId}>
+                    {provider.providerId}
+                  </option>
+                ))}
+              </select>
+              <ChevronDownIcon className="absolute right-2 top-1/2 transform -translate-y-1/2 w-5 h-5 pointer-events-none" />
+            </>
+          )}
         </div>
       </div>
 
@@ -122,11 +126,9 @@ const ChapterSelector = ({ chaptersData, data, setWatch, mangaId }) => {
             return (
               <Link
                 key={index}
-                href={`/en/manga/read/${selectedProvider}?id=${mangaId}&chapterId=${encodeURIComponent(
+                href={`/en/manga/read-new/${selectedProvider}/${encodeURIComponent(
                   chapter.id
-                )}${data?.id?.length > 6 ? "" : `&anilist=${data.id}`}&num=${
-                  chapter.number
-                }`}
+                )}?mangaId=${encodeURIComponent(mangaId)}&anilistId=${data.id}`}
                 className={`flex gap-3 py-4 hover:bg-secondary odd:bg-secondary/30 even:bg-primary`}
               >
                 <div className="flex w-full">
@@ -134,15 +136,11 @@ const ChapterSelector = ({ chaptersData, data, setWatch, mangaId }) => {
                     {chapter.number}
                   </span>
                   <p
-                    className={`w-full line-clamp-1 ${
-                      isRead ? "text-[#5f5f5f]" : "text-white"
-                    }
+                    className={`w-full line-clamp-1 ${isRead ? "text-[#5f5f5f]" : "text-white"
+                      }
                     `}
                   >
                     {chapter.title || `Chapter ${chapter.number}`}
-                  </p>
-                  <p className="capitalize text-sm text-white/50 px-4">
-                    {selectedProvider}
                   </p>
                 </div>
               </Link>
@@ -171,11 +169,10 @@ const ChapterSelector = ({ chaptersData, data, setWatch, mangaId }) => {
               <button
                 onClick={() => setCurrentPage((prev) => prev - 1)}
                 disabled={currentPage === 1}
-                className={`relative inline-flex items-center rounded px-2 py-2 text-gray-400 hover:bg-secondary focus:z-20 focus:outline-offset-0 ${
-                  currentPage === 1
-                    ? "opacity-50 cursor-default pointer-events-none"
-                    : ""
-                }`}
+                className={`relative inline-flex items-center rounded px-2 py-2 text-gray-400 hover:bg-secondary focus:z-20 focus:outline-offset-0 ${currentPage === 1
+                  ? "opacity-50 cursor-default pointer-events-none"
+                  : ""
+                  }`}
               >
                 <span className="sr-only">Previous</span>
                 <ChevronLeftIcon className="h-5 w-5" aria-hidden="true" />
@@ -186,11 +183,10 @@ const ChapterSelector = ({ chaptersData, data, setWatch, mangaId }) => {
                     key={index}
                     onClick={() => setCurrentPage(pageNumber)}
                     disabled={pageNumber === "..."}
-                    className={`relative rounded inline-flex items-center px-4 py-2 text-sm font-semibold text-txt  hover:bg-secondary focus:z-20 focus:outline-offset-0 ${
-                      currentPage === pageNumber
-                        ? "z-10 bg-secondary rounded text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-none"
-                        : ""
-                    }`}
+                    className={`relative rounded inline-flex items-center px-4 py-2 text-sm font-semibold text-txt  hover:bg-secondary focus:z-20 focus:outline-offset-0 ${currentPage === pageNumber
+                      ? "z-10 bg-secondary rounded text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-none"
+                      : ""
+                      }`}
                   >
                     {pageNumber}
                   </button>
@@ -199,11 +195,10 @@ const ChapterSelector = ({ chaptersData, data, setWatch, mangaId }) => {
               <button
                 onClick={() => setCurrentPage((prev) => prev + 1)}
                 disabled={currentPage === pageNumbers.length}
-                className={`relative inline-flex items-center rounded px-2 py-2 text-gray-400  hover:bg-secondary focus:z-20 focus:outline-offset-0 ${
-                  currentPage === pageNumbers.length
-                    ? "opacity-50 cursor-default"
-                    : ""
-                }`}
+                className={`relative inline-flex items-center rounded px-2 py-2 text-gray-400  hover:bg-secondary focus:z-20 focus:outline-offset-0 ${currentPage === pageNumbers.length
+                  ? "opacity-50 cursor-default"
+                  : ""
+                  }`}
               >
                 <span className="sr-only">Next</span>
                 <ChevronRightIcon className="h-5 w-5" aria-hidden="true" />

@@ -15,7 +15,6 @@ import Characters from "@/components/anime/charactersCard";
 import Content from "@/components/home/content";
 import { toast } from "sonner";
 import getAnifyInfo from "@/lib/anify/info";
-import getMangaId from "@/lib/anify/getMangaId";
 import { useRouter } from "next/router";
 import ChaptersComponent from "@/components/manga/ChaptersComponent";
 import pls from "@/utils/request/index";
@@ -125,27 +124,11 @@ export default function Manga({
           setInfo(info);
           setColor(color);
 
-          const mangaId = await getMangaId(
-            info?.title?.romaji,
-            info?.title?.english,
-            info?.title?.native
-          );
-
-          mangadexId = (mangaId as { id: string }).id;
-
-          if (mangadexId) {
-            setMangaId(mangadexId);
-            // console.log("mangadex is here", mangadexId);
-            router.push("/en/manga/" + aniId + "/" + mangadexId, undefined, {
-              shallow: true,
-            });
-          } else {
-            // console.log("why is this running?");
-            setMangaId(null);
-            setLoading(false);
-            setNotFound(true);
-            // router.push("/en/manga/" + aniId, undefined, { shallow: true });
-          }
+          // Skip Anify lookup - it's unreliable and timing out
+          // The ChaptersComponent will try to find this manga on Comix directly
+          console.log('Skipping Anify lookup - will try Comix provider instead');
+          setMangaId(null); // No Anify ID, will rely on title search
+          setLoading(false);
         } else if (!aniId && mangadexId) {
           data = await getAnifyInfo(mangadexId);
 
@@ -213,11 +196,10 @@ export default function Manga({
       <Head>
         <title>
           {metaData
-            ? `Manga - ${
-                metaData.title.romaji ||
-                metaData.title.english ||
-                metaData.title.native
-              }`
+            ? `Manga - ${metaData.title.romaji ||
+            metaData.title.english ||
+            metaData.title.native
+            }`
             : "Getting Info..."}
         </title>
         <meta
@@ -230,9 +212,8 @@ export default function Manga({
         />
         <meta
           property="og:title"
-          content={`Moopa - ${
-            metaData?.title.romaji || metaData?.title.english
-          }`}
+          content={`Moopa - ${metaData?.title.romaji || metaData?.title.english
+            }`}
         />
         <meta
           property="og:description"
@@ -240,9 +221,8 @@ export default function Manga({
         />
         <meta
           property="og:image"
-          content={`${domainUrl}/api/og?title=${
-            metaData?.title.romaji || metaData?.title.english
-          }&image=${metaData?.bannerImage || metaData?.coverImage}`}
+          content={`${domainUrl}/api/og?title=${metaData?.title.romaji || metaData?.title.english
+            }&image=${metaData?.bannerImage || metaData?.coverImage}`}
         />
         <meta
           property="og:url"
@@ -254,9 +234,8 @@ export default function Manga({
         <meta name="twitter:site" content="@yourTwitterHandle" />
         <meta
           name="twitter:title"
-          content={`Moopa - ${
-            metaData?.title.romaji || metaData?.title.english
-          }`}
+          content={`Moopa - ${metaData?.title.romaji || metaData?.title.english
+            }`}
         />
         <meta
           name="twitter:description"
@@ -265,9 +244,8 @@ export default function Manga({
         <meta name="robots" content="noindex" />
         <meta
           name="twitter:image"
-          content={`${domainUrl}/api/og?title=${
-            metaData?.title.romaji || metaData?.title.english
-          }&image=${metaData?.bannerImage || metaData?.coverImage}`}
+          content={`${domainUrl}/api/og?title=${metaData?.title.romaji || metaData?.title.english
+            }&image=${metaData?.bannerImage || metaData?.coverImage}`}
         />
       </Head>
       <Navbar info={info} manga />
@@ -305,8 +283,8 @@ export default function Manga({
         </div>
       </Modal>
       <MobileNav hideProfile={true} />
-      <main className="w-screen min-h-screen overflow-hidden relative flex flex-col items-center gap-5">
-        <div className="w-screen absolute">
+      <main className="w-screen min-h-screen relative flex flex-col items-center bg-primary gap-5 pt-16 lg:pt-20">
+        <div className="w-screen absolute top-16 lg:top-20">
           <div className="bg-gradient-to-t from-primary from-10% to-transparent absolute h-[280px] w-screen z-10 inset-0" />
           {info?.bannerImage && (
             <Image

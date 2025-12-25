@@ -53,9 +53,9 @@ export default function FirstPanel({
         if (
           scrollTop >= img?.offsetTop - scrollContainerRef.current.offsetTop &&
           scrollTop <
-            img.offsetTop -
-              scrollContainerRef.current.offsetTop +
-              img.offsetHeight
+          img.offsetTop -
+          scrollContainerRef.current.offsetTop +
+          img.offsetHeight
         ) {
           index = i;
           break;
@@ -133,6 +133,7 @@ export default function FirstPanel({
         className="longPanel h-screen w-full overflow-y-scroll lg:scrollbar-thin scrollbar-thumb-txt scrollbar-thumb-rounded-sm"
         ref={scrollContainerRef}
       >
+        {console.log('[FirstPanel] Data:', data, 'Length:', data?.length, 'Is Array:', Array.isArray(data))}
         {data && Array.isArray(data) && data?.length > 0 ? (
           data.map((i, index) => (
             <div
@@ -143,15 +144,14 @@ export default function FirstPanel({
               <Image
                 src={`https://aoi.moopa.live/utils/image-proxy?url=${encodeURIComponent(
                   i.url,
-                )}${
-                  i?.headers?.Referer
+                )}${i?.headers?.Referer
                     ? `&headers=${encodeURIComponent(
-                        JSON.stringify(i?.headers),
-                      )}`
+                      JSON.stringify(i?.headers),
+                    )}`
                     : `&headers=${encodeURIComponent(
-                        JSON.stringify(getHeaders(chapter.providerId)),
-                      )}`
-                }`}
+                      JSON.stringify(getHeaders(chapter.providerId)),
+                    )}`
+                  }`}
                 alt={index}
                 width={500}
                 height={500}
@@ -203,19 +203,16 @@ export default function FirstPanel({
         <div className="flex gap-2">
           <button
             type="button"
-            className={`flex-center rounded-sm p-2 ${
-              prevChapter
+            className={`flex-center rounded-sm p-2 ${prevChapter
                 ? "bg-secondary"
                 : "pointer-events-none bg-[#18181A] text-[#424245]"
-            }`}
+              }`}
             onClick={() =>
               router.push(
-                `/en/manga/read/${
-                  chapter.providerId
+                `/en/manga/read/${chapter.providerId
                 }?id=${mangadexId}&chapterId=${encodeURIComponent(
                   prevChapter?.id,
-                )}${aniId?.length > 6 ? "" : `&anilist=${aniId}`}&num=${
-                  prevChapter?.number
+                )}${aniId?.length > 6 ? "" : `&anilist=${aniId}`}&num=${prevChapter?.number
                 }`,
               )
             }
@@ -224,19 +221,16 @@ export default function FirstPanel({
           </button>
           <button
             type="button"
-            className={`flex-center rounded-sm p-2 ${
-              nextChapter
+            className={`flex-center rounded-sm p-2 ${nextChapter
                 ? "bg-secondary"
                 : "pointer-events-none bg-[#18181A] text-[#424245]"
-            }`}
+              }`}
             onClick={() =>
               router.push(
-                `/en/manga/read/${
-                  chapter.providerId
+                `/en/manga/read/${chapter.providerId
                 }?id=${mangadexId}&chapterId=${encodeURIComponent(
                   nextChapter?.id,
-                )}${aniId?.length > 6 ? "" : `&anilist=${aniId}`}&num=${
-                  nextChapter?.number
+                )}${aniId?.length > 6 ? "" : `&anilist=${aniId}`}&num=${nextChapter?.number
                 }`,
               )
             }
@@ -245,9 +239,8 @@ export default function FirstPanel({
           </button>
         </div>
       </div>
-      <span className="hidden lg:flex bg-secondary p-2 rounded-sm absolute bottom-5 right-5">{`Page ${
-        currentImageIndex + 1
-      }/${data?.length}`}</span>
+      <span className="hidden lg:flex bg-secondary p-2 rounded-sm absolute bottom-5 right-5">{`Page ${currentImageIndex + 1
+        }/${data?.length}`}</span>
     </section>
   );
 }

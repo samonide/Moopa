@@ -58,8 +58,8 @@ export async function getServerSideProps() {
           genre: genreDetail.props,
           detail: trendingDetail.props,
           populars: popularDetail.props,
-          firstTrend: trendingDetail.props.data[0],
-          trendingCarousel: trendingDetail.props.data.slice(0, 5),
+          firstTrend: trendingDetail.props.data?.[0] || null,
+          trendingCarousel: trendingDetail.props.data?.slice(0, 5) || [],
         }), // set cache for 2 hours
         "EX",
         60 * 60 * 2
@@ -74,8 +74,8 @@ export async function getServerSideProps() {
         detail: trendingDetail.props,
         populars: popularDetail.props,
         upComing,
-        firstTrend: trendingDetail.props.data[0],
-        trendingCarousel: trendingDetail.props.data.slice(0, 5),
+        firstTrend: trendingDetail.props.data?.[0] || null,
+        trendingCarousel: trendingDetail.props.data?.slice(0, 5) || [],
       },
     };
   }

@@ -1,0 +1,16 @@
+{
+    "id": "comix",
+    "name": "Comix",
+    "version": "1.0.0",
+    "manifestVersion": "1.0.0",
+    "type": "manga",
+    "author": "Moopa",
+    "description": "Manga provider for Comix.to",
+    "icon": "https://comix.to/favicon.ico",
+    "lang": [
+        "en"
+    ],
+    "settings": {
+        "supportsMultiScanlator": true
+    }
+}
